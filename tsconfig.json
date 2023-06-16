@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "incremental": true,
+    "target": "ES2018",
+    "removeComments": true,
+    "strict": true,
+    "strictPropertyInitialization": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "alwaysStrict": true,
+    "rootDir": "src",
+    "outDir": "dist",
+    "lib": ["ES2021"],
+    "esModuleInterop": true,
+    "moduleResolution": "node"
+  },
+  "include": ["*.*", "**/*.*"],
+  "exclude": ["node_modules"]
+}
