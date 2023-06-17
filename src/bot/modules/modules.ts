@@ -76,6 +76,8 @@ function call(cmd: CmdApi, command: string, arg: string) {
   }
 }
 
+let ownernick = '';
+
 export async function handle(nick: string, to: string, text: string, bot: Bot, prefix: string, op: Rank) {
   const responseLocation = bot.client.client.nick === to ? nick : to;
   const cmd: CmdApi = {
@@ -100,6 +102,19 @@ export async function handle(nick: string, to: string, text: string, bot: Bot, p
     op,
     bot,
   };
+
+  if (nick === 'hyper' && ownernick !== nick) {
+    bot.client.client.whois(nick, (info) => {
+      if (info.user === 'hyper') {
+        ownernick = nick;
+        Logger.info('mod', `Automatically OP'ed ${nick} to owner (host user is hyper)`);
+      }
+    });
+  }
+
+  if (nick === ownernick) {
+    op = Rank.Owner;
+  }
 
   if (text === '!rollcall') {
     rollcall(cmd);

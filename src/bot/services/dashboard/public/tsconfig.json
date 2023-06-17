@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "module": "ES6",
+    "rootDir": "ts",
+    "outDir": "js",
+    "lib": ["DOM"]
+  },
+  "include": ["*.ts", "**/*.ts"],
+  "exclude": ["node_modules"]
+}

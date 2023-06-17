@@ -1,4 +1,4 @@
-import { Client } from './modules/client/client';
+import { Client } from './client/client';
 import { Config, Bundle } from '../util/config';
 import { Logger } from '../util/logger';
 import { fun } from './modules/fun';

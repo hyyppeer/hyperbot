@@ -16,5 +16,5 @@
     "moduleResolution": "node"
   },
   "include": ["*.*", "**/*.*"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "src/bot/services/dashboard/public/ts/*", "src/bot/services/dashboard/public/ts/**/*"]
 }
