@@ -55,7 +55,7 @@ function rollcall(cmd: CmdApi) {
 export const commands: Record<string, Command> = {};
 
 function loadModule(mod: Module) {
-  Logger.info('modules', `loading module ${mod.name}`);
+  Logger.debug('modules', `loading module ${mod.name}`);
   for (const [key, value] of Object.entries(mod.contents)) {
     commands[key] = value;
   }

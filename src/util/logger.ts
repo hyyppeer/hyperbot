@@ -12,7 +12,8 @@ export enum LogLevel {
 export class Logger {
   private static loglvl: LogLevel;
   private static log(color: chalk.ChalkFunction, char: string, ctx: string, message: string, lvl: LogLevel) {
-    if (lvl >= this.loglvl) console.log(`${color(`[${char}]`)} [${ctx}]: ${message}`);
+    const ts = new Date();
+    if (lvl >= this.loglvl) console.log(`[${ts.getHours()}:${ts.getMinutes()}:${ts.getSeconds()}] ${color(`[${char}]`)} [${ctx}]: ${message}`);
   }
 
   static set level(lvl: LogLevel) {

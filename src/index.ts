@@ -9,7 +9,7 @@ export const config = readConfig('D:/hyperbot-town-irc/config/bot.conf');
 export const bundle = readBundle('D:/hyperbot-town-irc/config/bundle.conf');
 
 async function start() {
-  Logger.level = LogLevel.Verbose;
+  Logger.level = LogLevel.Debug;
 
   await Shell.start();
   const bot = new Bot(config, bundle);
