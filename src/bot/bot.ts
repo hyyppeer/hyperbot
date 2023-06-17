@@ -23,11 +23,11 @@ export class Bot {
     this.client = new Client(config.conn.server, config.conn.port, config.branding.name, config.conn.secure, config.bot.channels);
     init([utility, moderation, fun]);
 
-    this.client.client.on('message', async (nick, to, text, message) => {
+    this.client.client.on('message', async (nick, to, text) => {
       await handle(nick, to, text, this, '-', this.oprank(nick));
     });
     this.client.client.on('join', (channel, nick) => {
-      if (nick === this.client.client.nick) this.client.client.say(channel, bundle['text.onjoin']());
+      if (nick === this.client.client.nick) this.client.client.say(channel, bundle['text.onjoin'](config.branding.name, config.branding.owner));
     });
     this.client.client.on('quit', (nick) => {
       if (this.ops[nick]) delete this.ops[nick];

@@ -9,17 +9,17 @@ export class Shell {
   static async start(): Promise<void> {
     if (this.done) return;
     return new Promise((resolve) => {
-      Logger.info('shell', 'Connecting to hyper@tilde.town (ssh2)');
+      Logger.info('shell', `Connecting to ${config.shell.user}@tilde.town (ssh)`);
       this.done = true;
       this.ssh = new Ssh();
       this.ssh
         .on('ready', () => {
-          Logger.info('shell', 'Connected to hyper@tilde.town (ssh2)');
+          Logger.info('shell', `Connected to ${config.shell.user}@tilde.town (ssh)`);
           resolve();
         })
         .connect({
           host: 'tilde.town',
-          username: 'hyper',
+          username: config.shell.user,
           privateKey: readFileSync(config.shell.privatekey_path),
           port: 22,
         });

@@ -1,4 +1,6 @@
 import { readFileSync } from 'fs';
+import { Logger } from './logger';
+import { replaceAll } from './polyfills';
 
 export interface Config {
   [namespace: string]: Record<string, any>;
@@ -63,8 +65,9 @@ export function readBundle(path: string): Bundle {
     config[split[0]] = (...args: any[]) => {
       let str = split[1] || '';
 
-      for (const [replacement, index] of args) {
-        str = str.replaceAll(`$${index}`, replacement);
+      for (let i = 0; i < args.length; i++) {
+        const replacement = args[i];
+        str = replaceAll(str, `$${i}`, replacement);
       }
 
       return parseVal(str);

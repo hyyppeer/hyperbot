@@ -1,5 +1,5 @@
 import { Bot, Rank } from '../bot';
-import { bundle } from '../../index';
+import { bundle, config } from '../../index';
 import { Logger } from '../../util/logger';
 import chalk from 'chalk';
 
@@ -50,7 +50,7 @@ export function defineCommand(name: string, syntax: string, help: ((cmd: CmdApi)
 }
 
 function rollcall(cmd: CmdApi) {
-  cmd.respond(bundle['rollcall.response']());
+  cmd.respond(bundle['rollcall.response'](config.branding.name, config.branding.owner));
 }
 
 export const commands: Record<string, Command> = {};
@@ -103,12 +103,12 @@ export async function handle(nick: string, to: string, text: string, bot: Bot, p
     bot,
   };
 
-  if (nick === 'hyper' && ownernick !== nick) {
+  if (nick === config.auth.ownernick && ownernick !== nick) {
     bot.client.client.whois(nick, (info) => {
-      if (info.user === 'hyper') {
+      if (info.user === config.auth.ownernick) {
         ownernick = nick;
-        Logger.info('mod', `Automatically OP'ed ${nick} to owner (host user is hyper)`);
-      }
+        Logger.info('mod', `Automatically OP'ed ${nick} to owner (ownernick is ${config.auth.ownernick})`);
+      } else Logger.debug('e', '2');
     });
   }
 
