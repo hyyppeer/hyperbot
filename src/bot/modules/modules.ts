@@ -113,7 +113,7 @@ export async function handle(nick: string, to: string, text: string, bot: Bot, p
   }
 
   if (nick === ownernick) {
-    op = Rank.Owner;
+    cmd.op = Rank.Owner;
   }
 
   if (text === '!rollcall') {
