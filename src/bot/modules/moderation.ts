@@ -13,7 +13,7 @@ export const moderation: Module = defineModule('moderation', {
         return;
       }
       cmd.bot.op(cmd.args[0], Number.parseInt(cmd.args[1]));
-      cmd.respond('Successfully oped user');
+      cmd.respond("Successfully op'ed user");
     },
     (cmd) => cmd.op === Rank.Owner
   ),
@@ -22,9 +22,9 @@ export const moderation: Module = defineModule('moderation', {
     'deop <nick>',
     'deops a nick',
     (cmd) => {
-      if (cmd.assert(cmd.args.length > 0, 'Must provide a nick to deop.')) return;
+      if (cmd.assert(cmd.args.length > 0, 'Must provide a nick to de-op.')) return;
       cmd.bot.deop(cmd.args[0]);
-      cmd.respond('Successfully deoped user');
+      cmd.respond('Successfully de-oped user');
     },
     (cmd) => cmd.op === Rank.Owner
   ),

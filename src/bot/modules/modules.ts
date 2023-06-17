@@ -1,6 +1,7 @@
 import { Bot, Rank } from '../bot';
 import { bundle } from '../../index';
 import { Logger } from '../../util/logger';
+import chalk from 'chalk';
 
 export interface CmdApi {
   respond(text: string): void;
@@ -55,7 +56,7 @@ function rollcall(cmd: CmdApi) {
 export const commands: Record<string, Command> = {};
 
 function loadModule(mod: Module) {
-  Logger.debug('modules', `loading module ${mod.name}`);
+  Logger.debug('modules', `Loading module: ${chalk.greenBright(mod.name)}`);
   for (const [key, value] of Object.entries(mod.contents)) {
     commands[key] = value;
   }

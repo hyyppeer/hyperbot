@@ -1,3 +1,5 @@
+import { Socket } from 'net';
+
 interface Irc {
   colors: {
     wrap(color: string, text: string, reset_color?: string): string;
@@ -79,7 +81,20 @@ interface Message {
 }
 
 interface Nicks {
-  [nick: string]: '@' | '+' | '';
+  [nick: string]: '@' | '+' | '~' | '';
+}
+
+interface Chans {
+  [chan: string]: {
+    key: string;
+    serverName: string;
+    users: Nicks;
+    modeParams: unknown; //is object, tbd
+    topic: string;
+    mode: string;
+    topicBy: string;
+    created: string;
+  };
 }
 
 interface IrcClient extends IrcClientFunctions, IrcEvents {}
@@ -98,8 +113,8 @@ interface IrcClientFunctions {
   disconnect(message?: string, callback?: () => void): void;
   activateFloodProtection(interval: number): void;
   nick: string;
-  chans: unknown;
-  conn: unknown; // socket to server
+  chans: Chans;
+  conn: Socket;
   _whoisData(): unknown;
   _addWhoisData(data: WhoisInfo): void;
   _clearWhoisData(): void;

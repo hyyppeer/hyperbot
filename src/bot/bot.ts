@@ -34,12 +34,12 @@ export class Bot {
     });
     this.client.client.on('registered', () => {
       this.connected = true;
-      Logger.debug('bot', 'registered');
+      Logger.debug('bot', 'Registered on network');
     });
   }
 
   op(nick: string, rank: Rank) {
-    Logger.info('mod', `OP'ing ${nick}`);
+    Logger.info('mod', `${nick} is now OP ${rank}`);
     this.ops[nick] = rank;
   }
 

@@ -9,12 +9,12 @@ export class Shell {
   static async start(): Promise<void> {
     if (this.done) return;
     return new Promise((resolve) => {
-      Logger.info('shell', 'setting up shell');
+      Logger.info('shell', 'Connecting to hyper@tilde.town (ssh2)');
       this.done = true;
       this.ssh = new Ssh();
       this.ssh
         .on('ready', () => {
-          Logger.info('shell', 'shell is ready');
+          Logger.info('shell', 'Connected to hyper@tilde.town (ssh2)');
           resolve();
         })
         .connect({
@@ -25,20 +25,21 @@ export class Shell {
         });
     });
   }
-  static async exec(cmd: string): Promise<[string, number]> {
+  static async exec(cmd: string, input?: string): Promise<[string, number]> {
     return new Promise((resolve) => {
       this.ssh.exec(cmd, {}, (err, stream) => {
         if (err) {
-          Logger.error('shell', `local exec err: ${err}`);
+          Logger.error('shell', `Error while executing: ${err}`);
           return;
         }
+        if (input) stream.write(input);
         let data = '';
         stream
           .on('close', (code: number) => {
             resolve([data, code]);
           })
           .on('data', (dat: string) => (data += dat))
-          .stderr.on('data', (chnk) => Logger.warn('shell', `remote exec err: ${chnk}`));
+          .stderr.on('data', (chnk) => Logger.warn('shell', `Remote error while executing: ${chnk}`));
       });
     });
   }
