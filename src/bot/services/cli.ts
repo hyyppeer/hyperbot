@@ -1,4 +1,4 @@
-import { Bot, Rank } from '../bot';
+import { Bot } from '../bot';
 
 export class Cli {
   bot: Bot;
@@ -18,7 +18,7 @@ export class Cli {
       const split = cmdstr.split(' ');
       const command = split[0];
       const args = split.slice(1);
-      const arg = split.slice(1).join(' ');
+      const arg = args.join(' ');
 
       this.cmd(command, args, arg);
     }
@@ -35,7 +35,7 @@ export class Cli {
         this.bot.deop(args[0]);
         break;
       case 'js':
-        eval(args.join(' '));
+        eval(arg);
         break;
       default:
         break;

@@ -1,6 +1,7 @@
 import { Shell } from '../services/town/shell';
 import { Rank } from '../bot';
 import { commands, defineCommand, defineModule, Module, CmdApi } from './modules';
+import { noPingStore } from '../..';
 
 const topics: Record<string, string | ((cmd: CmdApi) => string)> = {
   'getting-started': 'use help to get a list of commands then help <command> to get info about a specific command, good luck on your journey!',
@@ -42,4 +43,31 @@ export const utility: Module = defineModule('utility', {
     },
     (cmd) => cmd.op === Rank.Owner
   ),
+  noping: defineCommand('noping', 'noping [<true/false>]', 'toggles/sets whether or not to ping you when responding', (cmd) => {
+    const list: Array<string> = JSON.parse(noPingStore.get('pings'));
+    const pinged = !list.includes(cmd.runner);
+
+    if (cmd.args[0]) {
+      const yeswords = ['yes', 'y', 'true', 't'];
+
+      if (yeswords.includes(cmd.args[0].toLowerCase())) {
+        if (!list.includes(cmd.runner)) list.push(cmd.runner);
+        else {
+          cmd.fail('you are already in the no ping list');
+          return;
+        }
+      } else {
+        if (list.includes(cmd.runner)) list.splice(list.indexOf(cmd.runner), 1);
+        else {
+          cmd.fail('you are already not in the no ping list');
+          return;
+        }
+      }
+    } else {
+      pinged ? list.push(cmd.runner) : list.splice(list.indexOf(cmd.runner), 1);
+    }
+
+    noPingStore.set('pings', JSON.stringify(list));
+    cmd.respond('success');
+  }),
 });

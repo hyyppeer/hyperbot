@@ -19,12 +19,17 @@ export class Bot {
   private ops: {
     [name: string]: Rank;
   } = {};
+  private chanops: {
+    [chan: string]: {
+      [name: string]: Rank;
+    };
+  } = {};
   constructor(config: Config, bundle: Bundle) {
     this.client = new Client(config.conn.server, config.conn.port, config.branding.name, config.conn.secure, config.bot.channels);
     init([utility, moderation, fun]);
 
     this.client.client.on('message', async (nick, to, text) => {
-      await handle(nick, to, text, this, '-', this.oprank(nick));
+      await handle(nick, to, text, this, '-', this.oprank(nick, to));
     });
     this.client.client.on('join', (channel, nick) => {
       if (nick === this.client.client.nick) this.client.client.say(channel, bundle['text.onjoin'](config.branding.name, config.branding.owner));
@@ -43,11 +48,24 @@ export class Bot {
     this.ops[nick] = rank;
   }
 
+  chanop(nick: string, rank: Rank, channel: string) {
+    Logger.info('mod', `${nick} is now OP ${rank} in channel ${channel}`);
+    if (this.chanops[channel]) this.chanops[channel][nick] = rank;
+  }
+
   deop(nick: string) {
+    Logger.info('mod', `${nick} is no longer OP`);
     if (this.ops[nick]) delete this.ops[nick];
   }
 
-  oprank(nick: string): Rank {
-    return this.ops[nick] || Rank.User;
+  dechanop(nick: string, channel: string) {
+    Logger.info('mod', `${nick} is no longer OP in ${channel}`);
+    if (this.chanops[channel] && this.chanops[channel][nick]) delete this.chanops[channel][nick];
+  }
+
+  oprank(nick: string, channel: string): Rank {
+    let rank = this.ops[nick] || Rank.User;
+    if (this.chanops[channel] && this.chanops[channel][nick] && this.chanops[channel][nick] > rank) rank = this.chanops[channel][nick];
+    return rank;
   }
 }

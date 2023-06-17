@@ -1,5 +1,5 @@
 import { Bot, Rank } from '../bot';
-import { bundle, config } from '../../index';
+import { bundle, config, noPingStore } from '../../index';
 import { Logger } from '../../util/logger';
 import chalk from 'chalk';
 
@@ -13,6 +13,7 @@ export interface CmdApi {
   assert(condition: boolean, message: string): boolean;
   op: Rank;
   bot: Bot;
+  channel: string;
 }
 
 interface Command {
@@ -62,8 +63,8 @@ function loadModule(mod: Module) {
   }
 }
 
-function call(cmd: CmdApi, command: string, arg: string) {
-  const commandobj = commands[command];
+function call(cmd: CmdApi, command: string) {
+  const commandobj = commands[command.toLowerCase()];
 
   if (!commandobj) {
     return;
@@ -72,17 +73,30 @@ function call(cmd: CmdApi, command: string, arg: string) {
   if (commandobj.authenticate(cmd)) {
     commandobj.run(cmd);
   } else {
-    cmd.respond(`Not permitted to run ${command}`);
+    cmd.respond(`Not permitted to run ${command.toLowerCase()}`);
   }
 }
 
 let ownernick = '';
 
-export async function handle(nick: string, to: string, text: string, bot: Bot, prefix: string, op: Rank) {
+function nickauth(nick: string, bot: Bot) {
+  if (nick === config.auth.ownernick && ownernick !== nick) {
+    bot.client.client.whois(nick, (info) => {
+      if (info.user === config.auth.ownernick) {
+        ownernick = nick;
+        Logger.info('mod', `Automatically OP'ed ${nick} to owner (ownernick is ${config.auth.ownernick})`);
+      } else Logger.debug('e', '2');
+    });
+  }
+}
+
+function createApi(nick: string, to: string, text: string, bot: Bot, prefix: string, op: Rank): CmdApi {
   const responseLocation = bot.client.client.nick === to ? nick : to;
-  const cmd: CmdApi = {
+  return {
     respond(text) {
-      bot.client.client.say(responseLocation, `${nick}: ${text}`);
+      let message = text;
+      if (!JSON.parse(noPingStore.get('pings')).includes(nick)) message = `${nick}: ${message}`;
+      bot.client.client.say(responseLocation, message);
     },
     runner: nick,
     args: text.startsWith(prefix) ? text.substring(prefix.length).split(' ').slice(1) : [],
@@ -101,16 +115,14 @@ export async function handle(nick: string, to: string, text: string, bot: Bot, p
     },
     op,
     bot,
+    channel: to,
   };
+}
 
-  if (nick === config.auth.ownernick && ownernick !== nick) {
-    bot.client.client.whois(nick, (info) => {
-      if (info.user === config.auth.ownernick) {
-        ownernick = nick;
-        Logger.info('mod', `Automatically OP'ed ${nick} to owner (ownernick is ${config.auth.ownernick})`);
-      } else Logger.debug('e', '2');
-    });
-  }
+export async function handle(nick: string, to: string, text: string, bot: Bot, prefix: string, op: Rank) {
+  const cmd: CmdApi = createApi(nick, to, text, bot, prefix, op);
+
+  nickauth(nick, bot);
 
   if (nick === ownernick) {
     cmd.op = Rank.Owner;
@@ -121,10 +133,10 @@ export async function handle(nick: string, to: string, text: string, bot: Bot, p
     return;
   }
 
-  if (text.startsWith(prefix)) {
-    const cmdtext = text.substring(prefix.length);
+  if (text.startsWith(prefix) || to === bot.client.client.nick) {
+    const cmdtext = text.startsWith(prefix) ? text.substring(prefix.length) : text;
     const split = cmdtext.split(' ');
-    call(cmd, split[0], split.slice(1).join(' '));
+    call(cmd, split[0]);
   }
 }
 

@@ -21,6 +21,7 @@ interface Irc {
       gray: 'u000314';
       light_gray: 'u000315';
       reset: 'u000f';
+      [colorname: string]: string;
     };
   };
   Client: new (server: string, nick: string, options: IrcOptions) => IrcClient;
