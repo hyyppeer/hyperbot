@@ -34,7 +34,7 @@ export class Bot {
     });
     this.client.client.on('registered', () => {
       this.connected = true;
-      Logger.info('bot', 'registered');
+      Logger.debug('bot', 'registered');
     });
   }
 
