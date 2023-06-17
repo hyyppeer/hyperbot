@@ -13,7 +13,7 @@ export class Logger {
   private static loglvl: LogLevel;
   private static log(color: chalk.ChalkFunction, char: string, ctx: string, message: string, lvl: LogLevel) {
     const ts = new Date();
-    if (lvl >= this.loglvl) console.log(`${chalk.grey(`[${ts.getHours().toString().padStart(2, '0')}:${ts.getMinutes().toString().padStart(2, '0')}:${ts.getSeconds().toString().padStart(2, '0')}]`)} ${color(`[${char}]`)} ${`${color(`[${chalk.reset(ctx)}]:`)} `.padEnd(13, ' ')}${message}`);
+    if (lvl >= this.loglvl) console.log(`${chalk.grey(`[${ts.getHours().toString().padStart(2, '0')}:${ts.getMinutes().toString().padStart(2, '0')}:${ts.getSeconds().toString().padStart(2, '0')}]`)} ${color(`[${char}]`)} ${`${color(`[${ctx}]:`)} `.padEnd(13, ' ')}${message}`);
   }
 
   static set level(lvl: LogLevel) {
