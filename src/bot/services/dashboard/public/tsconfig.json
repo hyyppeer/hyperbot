@@ -3,7 +3,8 @@
     "module": "ES6",
     "rootDir": "ts",
     "outDir": "js",
-    "lib": ["DOM"]
+    "lib": ["DOM", "DOM.Iterable"],
+    "typeRoots": ["../../../../../node_modules/@types"]
   },
   "include": ["*.ts", "**/*.ts"],
   "exclude": ["node_modules"]

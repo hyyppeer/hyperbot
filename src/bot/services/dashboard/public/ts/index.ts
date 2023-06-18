@@ -1,9 +1,9 @@
-while (true) {
-  const script = prompt('Enter JS to eval');
+function exec() {
+  const script = document.querySelector<HTMLTextAreaElement>('#script').value;
 
-  fetch('http://localhost:8080/api/eval', {
+  fetch('http://localhost:8080/api/extensionrun', {
     body: JSON.stringify({
-      script,
+      source: script,
     }),
     headers: {
       'Content-Type': 'application/json',
@@ -11,3 +11,7 @@ while (true) {
     method: 'POST',
   });
 }
+
+document.querySelector<HTMLButtonElement>('button#run').addEventListener('click', () => {
+  exec();
+});

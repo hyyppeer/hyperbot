@@ -6,9 +6,15 @@
     <title>Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" type="text/css" media="screen" href="/css/style.css" />
+    <script type="module" defer src="/monaco.js"></script>
     <script type="module" defer src="/js/index.js"></script>
+    <script src="https://unpkg.com/monaco-editor@latest/min/vs/loader.js"></script>
   </head>
   <body>
     <p>Welcome!</p>
+    <div id="extension-container" style="height: 70%">
+      <div id="editor" style="height: 80%"></div>
+      <button id="run">Run</button>
+    </div>
   </body>
 </html>

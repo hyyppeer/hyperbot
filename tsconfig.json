@@ -14,7 +14,9 @@
     "lib": ["ES2021"],
     "esModuleInterop": true,
     "moduleResolution": "node"
+    // "declarationDir": "declarations",
+    // "declaration": true
   },
   "include": ["*.*", "**/*.*"],
-  "exclude": ["node_modules", "src/bot/services/dashboard/public/ts/*", "src/bot/services/dashboard/public/ts/**/*"]
+  "exclude": ["node_modules", "src/bot/services/dashboard/public/*", "src/bot/services/dashboard/public/**/*"]
 }

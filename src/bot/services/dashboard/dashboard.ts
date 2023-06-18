@@ -5,6 +5,8 @@ import { Logger } from '../../../util/logger';
 import chalk from 'chalk';
 import { handle } from '../../modules/modules';
 import bodyparser from 'body-parser';
+import { Extension } from '../../../util/ext';
+import { readFileSync } from 'fs';
 
 export class Dashboard {
   bot: Bot;
@@ -18,6 +20,16 @@ export class Dashboard {
     this.app.post('/api/eval', async (req, res) => {
       handle(req.body.nick || 'dashboard-svc', req.body.channel || Object.keys(bot.client.client.chans)[0], `-eval ${req.body.script}`, bot, req.body.prefix || '-', req.body.rank || Rank.Owner);
       res.end('01 DOING');
+    });
+
+    this.app.post('/api/extensionrun', (req, res) => {
+      Extension.execute(req.body.source, bot);
+      res.end('00 EXECUTED');
+    });
+
+    this.app.get('/assets/declarations', (req, res) => {
+      const data = readFileSync(`${config.dashboard.declarationDir}${req.query.path}`).toString('utf8');
+      res.end(data);
     });
   }
 

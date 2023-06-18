@@ -1,7 +1,7 @@
 import { Rank } from '../bot';
 import { defineCommand, defineModule, Module } from './modules';
 
-export const moderation: Module = defineModule('moderation', {
+export const moderation: Module = defineModule('moderation', 'moderation commands', {
   op: defineCommand(
     'op',
     'op <nick> <rank>',

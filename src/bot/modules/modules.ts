@@ -28,13 +28,15 @@ interface ModuleContents {
 
 export interface Module {
   name: string;
+  help: string;
   contents: ModuleContents;
 }
 
-export function defineModule(name: string, contents: ModuleContents): Module {
+export function defineModule(name: string, help: string, contents: ModuleContents): Module {
   return {
     name,
     contents,
+    help,
   };
 }
 
@@ -53,9 +55,11 @@ function rollcall(cmd: CmdApi) {
 }
 
 export const commands: Record<string, Command> = {};
+export const modules: Record<string, Module> = {};
 
 function loadModule(mod: Module) {
   Logger.debug('modules', `Loading module: ${chalk.greenBright(mod.name)}`);
+  modules[mod.name] = mod;
   for (const [key, value] of Object.entries(mod.contents)) {
     commands[key] = value;
   }

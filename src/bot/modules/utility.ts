@@ -1,26 +1,36 @@
 import { Shell } from '../services/town/shell';
 import { Rank } from '../bot';
-import { commands, defineCommand, defineModule, Module, CmdApi } from './modules';
+import { commands, defineCommand, defineModule, Module, CmdApi, modules } from './modules';
 import { noPingStore } from '../..';
 
 const topics: Record<string, string | ((cmd: CmdApi) => string)> = {
   'getting-started': 'use help to get a list of commands then help <command> to get info about a specific command, good luck on your journey!',
+  commands: () => {
+    const list = Object.keys(commands);
+
+    return `here is a list of all commands: ${list.join(' ')}`;
+  },
 };
 
-export const utility: Module = defineModule('utility', {
+function help(name: string, cmd: CmdApi) {
+  if (modules[name]) {
+    return `module ${name}: help: ${modules[name].help}, commands: ${Object.keys(modules[name].contents).join(' ')}`;
+  } else if (commands[name]) {
+    return `command ${name}: syntax: ${commands[name].syntax}, help: ${commands[name].help(cmd)}`;
+  } else if (topics[name]) {
+    const topic = topics[name];
+    return `topic ${name}: ${typeof topic === 'string' ? topic : topic(cmd)}`;
+  } else {
+    return `${name} doesn't exist :(`;
+  }
+}
+
+export const utility: Module = defineModule('utility', 'commands for other purposes', {
   help: defineCommand('help', 'help [<command>]', 'get help about a specific command/topic or list all commands and topics', (cmd) => {
     if (cmd.args[0]) {
-      if (commands[cmd.args[0]]) {
-        const info = commands[cmd.args[0]];
-        cmd.respond(`syntax: ${info.syntax}, help: ${info.help(cmd)}`);
-      } else if (topics[cmd.args[0]]) {
-        const topic = topics[cmd.args[0]];
-        cmd.respond(`info about ${cmd.args[0]}: ${typeof topic === 'string' ? topic : topic(cmd)}`);
-      } else {
-        cmd.respond('No such command exists');
-      }
+      cmd.respond(help(cmd.args[0], cmd));
     } else {
-      cmd.respond(`Commands: ${Object.keys(commands).join(' ')} | Topics: ${Object.keys(topics).join(' ')}`);
+      cmd.respond(`Modules: ${Object.keys(modules).join(' ')} | Topics: ${Object.keys(topics).join(' ')}`);
     }
   }),
   sh: defineCommand(
@@ -43,7 +53,7 @@ export const utility: Module = defineModule('utility', {
     },
     (cmd) => cmd.op === Rank.Owner
   ),
-  noping: defineCommand('noping', 'noping [<true/false>]', 'toggles/sets whether or not to ping you when responding', (cmd) => {
+  noping: defineCommand('noping', 'noping [<true/false/yes/y/no/n/t/f>]', 'toggles/sets whether or not to ping you when responding', (cmd) => {
     const list: Array<string> = JSON.parse(noPingStore.get('pings'));
     const pinged = !list.includes(cmd.runner);
 
