@@ -10,6 +10,7 @@ export const config = readConfig('D:/hyperbot-town-irc/config/bot.conf');
 export const bundle = readBundle('D:/hyperbot-town-irc/config/bundle.conf');
 
 export const noPingStore = new Store('noping');
+export const lastSeenStore = new Store('lastseen');
 
 async function start() {
   Logger.level = LogLevel.Debug;
@@ -27,6 +28,7 @@ async function start() {
   });
 
   setInterval(() => bot.client.client.say('#bots', '!water hyper'), 1 * 24 * 60 * 60 * 1000);
+  setInterval(() => config.bot.channels.forEach((chan: string) => bot.scanchan(chan)), 5 * 60 * 1000);
 }
 
 start();

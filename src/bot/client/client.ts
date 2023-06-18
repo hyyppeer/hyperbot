@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import { Logger } from '../../util/logger';
-import { Irc, IrcClient } from './irc';
+import { Irc, IrcClient, WhoisInfo } from './irc';
 
 const irc: Irc = require('irc');
 
@@ -75,6 +75,12 @@ export class Client {
       if (info.serverinfo) Logger.verbose('whois', `serverinfo: ${info.serverinfo}`);
       if (info.server) Logger.verbose('whois', `server: ${info.server}`);
       Logger.verbose('whois', `real name: ${info.realname}`);
+    });
+  }
+
+  async whois(nick: string): Promise<WhoisInfo> {
+    return new Promise((resolve) => {
+      this.client.whois(nick, resolve);
     });
   }
 }

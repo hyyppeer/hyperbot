@@ -5,6 +5,8 @@ import { fun } from './modules/fun';
 import { moderation } from './modules/moderation';
 import { handle, init } from './modules/modules';
 import { utility } from './modules/utility';
+import { social } from './modules/social';
+import { LastSeen } from './services/lastseen';
 
 export enum Rank {
   User = 0,
@@ -26,13 +28,17 @@ export class Bot {
   } = {};
   constructor(config: Config, bundle: Bundle) {
     this.client = new Client(config.conn.server, config.conn.port, config.branding.name, config.conn.secure, config.bot.channels);
-    init([utility, moderation, fun]);
+    init([utility, moderation, fun, social]);
 
     this.client.client.on('message', async (nick, to, text) => {
       await handle(nick, to, text, this, '-', this.oprank(nick, to));
     });
     this.client.client.on('join', (channel, nick) => {
-      if (nick === this.client.client.nick) this.client.client.say(channel, bundle['text.onjoin'](config.branding.name, config.branding.owner));
+      LastSeen.seen(nick);
+      if (nick === this.client.client.nick) {
+        this.client.client.say(channel, bundle['text.onjoin'](config.branding.name, config.branding.owner));
+        setTimeout(() => this.scanchan(channel), 5000);
+      }
     });
     this.client.client.on('quit', (nick) => {
       if (this.ops[nick]) delete this.ops[nick];
@@ -67,5 +73,11 @@ export class Bot {
     let rank = this.ops[nick] || Rank.User;
     if (this.chanops[channel] && this.chanops[channel][nick] && this.chanops[channel][nick] > rank) rank = this.chanops[channel][nick];
     return rank;
+  }
+
+  scanchan(channel: string) {
+    Logger.verbose('lastseen', `Scanning channel ${channel}`);
+    const users = Object.keys(this.client.client.chans[channel].users);
+    LastSeen.seeall(users);
   }
 }

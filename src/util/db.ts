@@ -11,7 +11,7 @@ export class Store {
     this.data = JSON.parse(readFileSync(this.path).toString() || '{}');
   }
 
-  get(key: string): string {
+  get(key: string): string | null {
     return this.data[key];
   }
   set(key: string, value: string) {

@@ -85,14 +85,13 @@ function call(cmd: CmdApi, command: string) {
 
 let ownernick = '';
 
-function nickauth(nick: string, bot: Bot) {
+async function nickauth(nick: string, bot: Bot) {
   if (nick === config.auth.ownernick && ownernick !== nick) {
-    bot.client.client.whois(nick, (info) => {
-      if (info.user === config.auth.ownernick) {
-        ownernick = nick;
-        Logger.info('mod', `Automatically OP'ed ${nick} to owner (ownernick is ${config.auth.ownernick})`);
-      } else Logger.debug('e', '2');
-    });
+    const info = await bot.client.whois(nick);
+    if (info.user === config.auth.ownernick) {
+      ownernick = nick;
+      Logger.info('mod', `Automatically OP'ed ${nick} to owner (ownernick is ${config.auth.ownernick})`);
+    }
   }
 }
 
@@ -101,12 +100,12 @@ function createApi(nick: string, to: string, text: string, bot: Bot, prefix: str
   return {
     respond(text, pm) {
       let message = text;
-      if (!JSON.parse(noPingStore.get('pings')).includes(nick)) message = `${nick}: ${message}`;
+      if (!JSON.parse(noPingStore.get('pings') || '[]').includes(nick) && to !== bot.client.client.nick) message = `${nick}: ${message}`;
       bot.client.client.say(pm || false ? nick : responseLocation, message);
     },
     runner: nick,
-    args: text.startsWith(prefix) ? text.substring(prefix.length).split(' ').slice(1) : [],
-    arg: text.startsWith(prefix) ? text.substring(prefix.length).split(' ').slice(1).join(' ') : '',
+    args: text.startsWith(prefix) ? text.substring(prefix.length).split(' ').slice(1) : to === bot.client.client.nick ? text.split(' ').slice(1) : [],
+    arg: text.startsWith(prefix) ? text.substring(prefix.length).split(' ').slice(1).join(' ') : to === bot.client.client.nick ? text.split(' ').slice(1).join(' ') : '',
     todo() {
       this.respond('command is todo');
     },
@@ -119,7 +118,7 @@ function createApi(nick: string, to: string, text: string, bot: Bot, prefix: str
 export async function handle(nick: string, to: string, text: string, bot: Bot, prefix: string, op: Rank) {
   const cmd: CmdApi = createApi(nick, to, text, bot, prefix, op);
 
-  nickauth(nick, bot);
+  await nickauth(nick, bot);
 
   if (nick === ownernick) {
     cmd.op = Rank.Owner;
