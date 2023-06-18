@@ -6,6 +6,8 @@ const irc: Irc = require('irc');
 
 export class Client {
   client: IrcClient;
+  private questionCallbackTable: Record<string, (answer: string) => void> = {};
+  private learntQuestioning: string[] = [];
   constructor(server: string, port: number, nickname: string, secure: boolean, channels: string[]) {
     Logger.info('client', `connecting to ${chalk.redBright(`${server}:${port}`)} as ${chalk.greenBright(nickname)} (secure? ${secure ? chalk.greenBright('yes') : chalk.redBright('no')}) in ${channels.join(' ')}`);
     this.client = new irc.Client(server, nickname, {
@@ -19,6 +21,12 @@ export class Client {
     });
 
     this.startLogging(server, port, nickname);
+
+    this.client.on('message', (nick, to, text) => {
+      if (!(this.questionCallbackTable[nick] && text.toLowerCase().startsWith('a> '))) return;
+      this.questionCallbackTable[nick](text.substring(3));
+      this.learntQuestioning.includes(nick) ? undefined : this.learntQuestioning.push(nick);
+    });
   }
 
   private startLogging(server: string, port: number, nickname: string) {
@@ -81,6 +89,17 @@ export class Client {
   async whois(nick: string): Promise<WhoisInfo> {
     return new Promise((resolve) => {
       this.client.whois(nick, resolve);
+    });
+  }
+
+  private questionCb(nick: string, callback: (answer: string) => void, loc: string, question: string): void {
+    this.client.say(loc, `${nick} ?> ${question}${this.learntQuestioning.includes(nick) ? '' : '\nRespond by saying "A> [your answer here]"'}`);
+    this.questionCallbackTable[nick] = callback;
+  }
+
+  async question(nick: string, question: string, loc: string = nick): Promise<string> {
+    return new Promise((resolve) => {
+      this.questionCb(nick, resolve, loc, question);
     });
   }
 }

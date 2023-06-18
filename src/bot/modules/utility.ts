@@ -1,10 +1,12 @@
 import { Shell } from '../services/town/shell';
 import { Rank } from '../bot';
 import { commands, defineCommand, defineModule, Module, CmdApi, modules } from './modules';
-import { noPingStore } from '../..';
+import { config, noPingStore } from '../..';
 import axios from 'axios';
 import { Logger } from '../../util/logger';
 import { replaceAll } from '../../util/polyfills';
+import { JsonCmdAction, JsonCmdActionType, JsonCmdListener, JsonCommand, JsonCommands, JsonPackage } from '../../util/jsoncmds';
+import { readFileSync } from 'fs';
 
 const topics: Record<string, string | ((cmd: CmdApi) => string)> = {
   'getting-started': 'use help to get a list of commands then help <command> to get info about a specific command, good luck on your journey!',
@@ -129,4 +131,105 @@ export const utility: Module = defineModule('utility', 'commands for other purpo
   uptime: defineCommand('uptime', 'uptime', 'shows how much the bot has been running', (cmd) => {
     cmd.respond(`${Math.floor(process.uptime())}s`);
   }),
+  loadpkg: defineCommand(
+    'loadpkg',
+    'loadpkg <pkg-name>',
+    'load a package from json-pkgs',
+    (cmd) => {
+      if (!cmd.args[0]) throw 'must provide a package path';
+      JsonCommands.loadPackage(readFileSync(`${config.jsonpkg.rootdir}/${cmd.args[0]}`).toString('utf8'));
+    },
+    (cmd) => cmd.op >= Rank.Owner
+  ),
+  createpkg: defineCommand(
+    'createpkg',
+    'createpkg',
+    'create a package, you will be asked to enter info about it',
+    async (cmd) => {
+      const name = await cmd.ask('What would you like to name your package?');
+      const help = await cmd.ask('Please enter a help string for your package.');
+      let commands: JsonCommand[] = [];
+
+      while (true) {
+        const enter = await cmd.ask('Would you like to add a command? (Y/n)');
+        if (!enter.toLowerCase().startsWith('y')) {
+          break;
+        }
+
+        const name = await cmd.ask('What would you like to name this command?');
+        const syntax = await cmd.ask('What is the syntax to use this command?');
+        const rank = Number.parseInt(await cmd.ask('What is the minimum rank to use this command? (1-3)'));
+        const listeners: JsonCmdListener[] = [];
+        while (true) {
+          const enter = await cmd.ask('Would you like to add a listener? (Y/n)');
+          if (!enter.toLowerCase().startsWith('y')) {
+            break;
+          }
+
+          const onans = await cmd.ask('When would you like this command to be triggered? (ran)');
+          const on = onans === 'ran' ? onans : 'ran';
+
+          const actions: JsonCmdAction[] = [];
+          while (true) {
+            const enter = await cmd.ask('Would you like to add an action? (Y/n)');
+            if (!enter.toLowerCase().startsWith('y')) {
+              break;
+            }
+
+            const typea = await cmd.ask('What is the type of this action? (say/do)');
+            const type: JsonCmdActionType = typea === 'do' ? typea : 'say';
+
+            const argarr: string[] = [];
+            while (true) {
+              const enter = await cmd.ask('Would you like to add an argument? (Y/n)');
+              if (!enter.toLowerCase().startsWith('y')) {
+                break;
+              }
+
+              const arg = await cmd.ask('Please enter the argument.');
+              argarr.push(arg);
+            }
+            actions.push({
+              type,
+              args: argarr,
+            });
+          }
+          listeners.push({
+            on,
+            actions,
+          });
+        }
+        commands.push({
+          help,
+          listeners,
+          syntax,
+          name,
+          rankRequired: rank,
+        });
+      }
+
+      const pkg: JsonPackage = {
+        name,
+        help,
+        commands,
+      };
+
+      const pkgstr = JsonCommands.createPackage(pkg);
+
+      cmd.respond(`Here is your package string: ${pkgstr}`);
+      cmd.respond('Load it using the loadpkgstr command');
+    },
+    (cmd) => cmd.op >= Rank.Owner
+  ),
+  loadpkgstr: defineCommand(
+    'loadpkgstr',
+    'loadpkgstr <pkgstr>',
+    'loads a package from its json script',
+    (cmd) => {
+      if (!cmd.arg) throw 'No string provided';
+
+      JsonCommands.loadPackage(cmd.arg);
+    },
+    (cmd) => cmd.op >= Rank.Owner
+  ),
 });

@@ -12,6 +12,9 @@ export interface CmdApi {
   op: Rank;
   bot: Bot;
   channel: string;
+  responseLoc: string;
+  ask(question: string): Promise<string>;
+  confirm(): Promise<boolean>;
 }
 
 interface Command {
@@ -22,7 +25,7 @@ interface Command {
   help: (cmd: CmdApi) => string;
 }
 
-interface ModuleContents {
+export interface ModuleContents {
   [name: string]: Command;
 }
 
@@ -112,6 +115,13 @@ function createApi(nick: string, to: string, text: string, bot: Bot, prefix: str
     op,
     bot,
     channel: to,
+    responseLoc: responseLocation,
+    async ask(question) {
+      return bot.client.question(nick, question, responseLocation);
+    },
+    async confirm() {
+      return (await this.ask('Are you sure?')).toLowerCase().startsWith('y') ? true : false;
+    },
   };
 }
 
