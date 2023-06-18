@@ -4,13 +4,11 @@ import { Logger } from '../../util/logger';
 import chalk from 'chalk';
 
 export interface CmdApi {
-  respond(text: string): void;
+  respond(text: string, pm?: boolean): void;
   runner: string;
   args: Array<string>;
   arg: string;
   todo(): void;
-  fail(reason: string): void;
-  assert(condition: boolean, message: string): boolean;
   op: Rank;
   bot: Bot;
   channel: string;
@@ -71,7 +69,11 @@ function call(cmd: CmdApi, command: string) {
   }
 
   if (commandobj.authenticate(cmd)) {
-    commandobj.run(cmd);
+    try {
+      commandobj.run(cmd);
+    } catch (e) {
+      cmd.respond('fail: ' + e);
+    }
   } else {
     cmd.respond(`Not permitted to run ${command.toLowerCase()}`);
   }
@@ -91,27 +93,18 @@ function nickauth(nick: string, bot: Bot) {
 }
 
 function createApi(nick: string, to: string, text: string, bot: Bot, prefix: string, op: Rank): CmdApi {
-  const responseLocation = bot.client.client.nick === to ? nick : to;
+  let responseLocation = bot.client.client.nick === to ? nick : to;
   return {
-    respond(text) {
+    respond(text, pm) {
       let message = text;
       if (!JSON.parse(noPingStore.get('pings')).includes(nick)) message = `${nick}: ${message}`;
-      bot.client.client.say(responseLocation, message);
+      bot.client.client.say(pm || false ? nick : responseLocation, message);
     },
     runner: nick,
     args: text.startsWith(prefix) ? text.substring(prefix.length).split(' ').slice(1) : [],
     arg: text.startsWith(prefix) ? text.substring(prefix.length).split(' ').slice(1).join(' ') : '',
     todo() {
       this.respond('command is todo');
-    },
-    fail(reason: string) {
-      this.respond(`fail: ${reason}`);
-    },
-    assert(condition, message) {
-      if (!condition) {
-        this.fail(message);
-      }
-      return !condition;
     },
     op,
     bot,

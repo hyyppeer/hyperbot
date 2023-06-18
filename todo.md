@@ -2,13 +2,13 @@ https://github.com/bitbot-irc/bitbot/tree/master/modules is a great source for i
 
 [X] option to turn off pinging on response
 [X] must persist
-[] per channel ops
+[X] per channel ops
 [] improved cli
 [] tcoin system
 [] revenue generation through &tilde game
 [] connect to ~chat too (no integration between them though)
 [X] on tilde.town irc, authenticate using the user in hostname
-[] instead of cmd.fail and cmd.assert, running commands should be in a try-catch and commands throw errors instead of using cmd.fail. the fail message should be the same
+[X] instead of cmd.fail and cmd.assert, running commands should be in a try-catch and commands throw errors instead of using cmd.fail. the fail message should be the same
 [] something likes ducks for tilde.town irc
 [] leaderboard for it (shows top 10)
 [] polls

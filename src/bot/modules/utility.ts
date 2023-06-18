@@ -53,14 +53,12 @@ export const utility: Module = defineModule('utility', {
       if (yeswords.includes(cmd.args[0].toLowerCase())) {
         if (!list.includes(cmd.runner)) list.push(cmd.runner);
         else {
-          cmd.fail('you are already in the no ping list');
-          return;
+          throw 'you are already in the no ping list';
         }
       } else {
         if (list.includes(cmd.runner)) list.splice(list.indexOf(cmd.runner), 1);
         else {
-          cmd.fail('you are already not in the no ping list');
-          return;
+          throw 'You are already not in the no ping list';
         }
       }
     } else {
