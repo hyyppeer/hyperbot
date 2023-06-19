@@ -6,7 +6,8 @@ import axios from 'axios';
 import { Logger } from '../../util/logger';
 import { replaceAll } from '../../util/polyfills';
 import { JsonCmdAction, JsonCmdActionType, JsonCmdListener, JsonCommand, JsonCommands, JsonPackage } from '../../util/jsoncmds';
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
+import { randomBytes } from 'crypto';
 
 const topics: Record<string, string | ((cmd: CmdApi) => string)> = {
   'getting-started': 'use help to get a list of commands then help <command> to get info about a specific command, good luck on your journey!',
@@ -146,23 +147,23 @@ export const utility: Module = defineModule('utility', 'commands for other purpo
     'createpkg',
     'create a package, you will be asked to enter info about it',
     async (cmd) => {
+      cmd.respond('Please note: only ASCII characters are allowed in these fields');
       const name = await cmd.ask('What would you like to name your package?');
       const help = await cmd.ask('Please enter a help string for your package.');
       let commands: JsonCommand[] = [];
 
       while (true) {
-        const enter = await cmd.ask('Would you like to add a command? (Y/n)');
-        if (!enter.toLowerCase().startsWith('y')) {
+        if (!(await cmd.confirm('Would you like to add a command? (y/N)'))) {
           break;
         }
 
         const name = await cmd.ask('What would you like to name this command?');
         const syntax = await cmd.ask('What is the syntax to use this command?');
+        const help = await cmd.ask('What is the help for this command?');
         const rank = Number.parseInt(await cmd.ask('What is the minimum rank to use this command? (1-3)'));
         const listeners: JsonCmdListener[] = [];
         while (true) {
-          const enter = await cmd.ask('Would you like to add a listener? (Y/n)');
-          if (!enter.toLowerCase().startsWith('y')) {
+          if (!(await cmd.confirm('Would you like to add a listener? (y/N)'))) {
             break;
           }
 
@@ -171,8 +172,7 @@ export const utility: Module = defineModule('utility', 'commands for other purpo
 
           const actions: JsonCmdAction[] = [];
           while (true) {
-            const enter = await cmd.ask('Would you like to add an action? (Y/n)');
-            if (!enter.toLowerCase().startsWith('y')) {
+            if (!(await cmd.confirm('Would you like to add an action? (y/N)'))) {
               break;
             }
 
@@ -181,8 +181,7 @@ export const utility: Module = defineModule('utility', 'commands for other purpo
 
             const argarr: string[] = [];
             while (true) {
-              const enter = await cmd.ask('Would you like to add an argument? (Y/n)');
-              if (!enter.toLowerCase().startsWith('y')) {
+              if (!(await cmd.confirm('Would you like to add an argument? (y/N)'))) {
                 break;
               }
 
@@ -215,16 +214,26 @@ export const utility: Module = defineModule('utility', 'commands for other purpo
       };
 
       const pkgstr = JsonCommands.createPackage(pkg);
+      const json = JsonCommands.decompress(pkgstr);
 
       cmd.respond(`Here is your package string: ${pkgstr}`);
       cmd.respond('Load it using the loadpkgstr command');
+      const submit = await cmd.confirm('Would you like to submit this package to be reviewed and potentially added to the bot?');
+
+      if (submit) {
+        const pkgid = randomBytes(8).toString('hex');
+        writeFileSync(`${config.jsonpkg.submissionrootdir}/submit-${pkgid}.pkg`, pkgstr);
+        writeFileSync(`${config.jsonpkg.submissionrootdir}/submit-${pkgid}.json`, json);
+        cmd.respond('Submitted!');
+        Logger.info('package', `Submitted package ${pkgid} for review in ${config.jsonpkg.submissionrootdir}`);
+      } else cmd.respond('Your package has not been submitted');
     },
     (cmd) => cmd.op >= Rank.Owner
   ),
   loadpkgstr: defineCommand(
     'loadpkgstr',
     'loadpkgstr <pkgstr>',
-    'loads a package from its json script',
+    'loads a package from its pkgstr',
     (cmd) => {
       if (!cmd.arg) throw 'No string provided';
 

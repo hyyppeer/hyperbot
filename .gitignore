@@ -6,3 +6,5 @@ src/bot/services/dashboard/public/js
 src/bot/services/dashboard/public/css
 db/*
 declarations/
+json-pkgs/
+jsonpkg-review/

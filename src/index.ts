@@ -28,7 +28,6 @@ async function start() {
   });
 
   setInterval(() => bot.client.client.say('#bots', '!water hyper'), 1 * 24 * 60 * 60 * 1000);
-  setInterval(() => config.bot.channels.forEach((chan: string) => bot.scanchan(chan)), 5 * 60 * 1000);
 }
 
 start();

@@ -13,9 +13,10 @@
     "outDir": "dist",
     "lib": ["ES2021"],
     "esModuleInterop": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
     // "declarationDir": "declarations",
     // "declaration": true
+    "experimentalDecorators": true
   },
   "include": ["*.*", "**/*.*"],
   "exclude": ["node_modules", "src/bot/services/dashboard/public/*", "src/bot/services/dashboard/public/**/*"]

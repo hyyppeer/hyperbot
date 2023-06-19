@@ -14,7 +14,7 @@ export interface CmdApi {
   channel: string;
   responseLoc: string;
   ask(question: string): Promise<string>;
-  confirm(): Promise<boolean>;
+  confirm(confirmation?: string): Promise<boolean>;
 }
 
 interface Command {
@@ -119,8 +119,8 @@ function createApi(nick: string, to: string, text: string, bot: Bot, prefix: str
     async ask(question) {
       return bot.client.question(nick, question, responseLocation);
     },
-    async confirm() {
-      return (await this.ask('Are you sure?')).toLowerCase().startsWith('y') ? true : false;
+    async confirm(confirmation?: string) {
+      return (await this.ask(confirmation || 'Are you sure?')).toLowerCase().startsWith('y') ? true : false;
     },
   };
 }

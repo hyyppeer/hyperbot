@@ -49,12 +49,13 @@ function parseArgArr(arr: string[], cmd: CmdApi): string {
 }
 
 export class JsonCommands {
+  static encoding: BufferEncoding = 'base64';
   static createPackage(pkg: JsonPackage): string {
-    return JSON.stringify(pkg);
+    return this.compress(JSON.stringify(pkg));
   }
 
   static loadPackage(pkgstr: string) {
-    const pkg: JsonPackage = JSON.parse(pkgstr);
+    const pkg: JsonPackage = JSON.parse(this.decompress(pkgstr));
     let contents: ModuleContents = {};
 
     pkg.commands.forEach((command) => {
@@ -86,5 +87,13 @@ export class JsonCommands {
     });
 
     modules[pkg.name] = defineModule(pkg.name, pkg.help, contents);
+  }
+
+  static compress(uncompressed: string): string {
+    return Buffer.from(uncompressed, 'ascii').toString(this.encoding);
+  }
+
+  static decompress(compressed: string): string {
+    return Buffer.from(compressed, this.encoding).toString('ascii');
   }
 }
