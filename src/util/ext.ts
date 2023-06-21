@@ -22,12 +22,12 @@ const util = {
 };
 
 export class Extension {
-  static execute(extsrc: string, bot: Bot, cmd: modules.CmdApi) {
+  static execute(extsrc: string, bot: Bot, cmd: modules.CmdApi): any {
     const ext = createExtApi(bot);
     const $modules = modules;
     const $shell = Shell;
     const $ = cmd;
     const _ = util;
-    eval(extsrc);
+    return eval(extsrc);
   }
 }
