@@ -14,7 +14,7 @@ https://github.com/bitbot-irc/bitbot/tree/master/modules is a great source for i
 [] something likes ducks for tilde.town irc
 [] leaderboard for it (shows top 10)
 [] polls
-[] reminders to remind users (arguments: text, duration)
+[X] reminders to remind users (arguments: text, duration)
 [] statistics
 [] maybe a leveling system
 [] wikipedia api

@@ -15,12 +15,19 @@ function createExtApi(bot: Bot): ExtApi {
   };
 }
 
+const util = {
+  random<T>(array: T[]): T {
+    return array[Math.floor(Math.random() * array.length)];
+  },
+};
+
 export class Extension {
   static execute(extsrc: string, bot: Bot, cmd: modules.CmdApi) {
     const ext = createExtApi(bot);
     const $modules = modules;
     const $shell = Shell;
     const $ = cmd;
+    const _ = util;
     eval(extsrc);
   }
 }
