@@ -16,10 +16,11 @@ function createExtApi(bot: Bot): ExtApi {
 }
 
 export class Extension {
-  static execute(extsrc: string, bot: Bot) {
+  static execute(extsrc: string, bot: Bot, cmd: modules.CmdApi) {
     const ext = createExtApi(bot);
     const $modules = modules;
     const $shell = Shell;
+    const $ = cmd;
     eval(extsrc);
   }
 }

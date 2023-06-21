@@ -137,7 +137,7 @@ export const utility: Module = defineModule('utility', 'commands for other purpo
     (cmd) => {
       if (!cmd.arg) throw CommandErrorId.NotEnoughArguments;
 
-      Extension.execute(cmd.arg, cmd.bot);
+      Extension.execute(cmd.arg, cmd.bot, cmd);
     },
     (cmd) => cmd.op === Rank.Owner
   ),
