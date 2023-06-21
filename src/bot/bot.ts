@@ -9,9 +9,7 @@ import { social } from './modules/social';
 import { LastSeen } from './services/lastseen';
 import { packages } from './modules/packages';
 import { reminders } from './modules/reminders';
-import { tips } from './modules/tips';
 import { repl } from './modules/repl';
-import { botapi } from './modules/botapi';
 
 export enum Rank {
   User = 0,
@@ -34,7 +32,7 @@ export class Bot {
   } = {};
   constructor(config: Config, bundle: Bundle) {
     this.client = new Client(config.conn.server, config.conn.port, config.branding.name, config.conn.secure, config.bot.channels, config.branding.username, config.branding.realname);
-    init([utility, moderation, fun, social, packages, reminders, repl, botapi /*, tips*/], this);
+    init([utility, moderation, fun, social, packages, reminders, repl /*, tips*/], this);
 
     this.client.client.on('message', async (nick, to, text) => {
       await handle(nick, to, text, this, '-', this.oprank(nick, to), this.users[nick]);
