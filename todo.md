@@ -3,6 +3,7 @@ https://github.com/bitbot-irc/bitbot/tree/master/modules is a great source for i
 [X] option to turn off pinging on response
 [X] must persist
 [X] per channel ops
+[] subscribe command notifies users when a new post from an rss feed is posted
 [] hyperscript language: a simple scripting language for writing scripts for hyperbot that can be written and ran by everybody
 [] improved cli
 [] tcoin system

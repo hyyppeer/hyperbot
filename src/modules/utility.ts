@@ -2,9 +2,6 @@ import { Shell } from '../bot/services/town/shell';
 import { Rank } from '../bot/bot';
 import { defineCommand, defineModule, Module, CommandErrorId } from './modules';
 import { noPingStore } from '..';
-import axios from 'axios';
-import { Logger } from '../util/logger';
-import { replaceAll } from '../util/polyfills';
 import { Extension } from '../util/ext';
 
 export const utility: Module = defineModule('utility', {
@@ -52,51 +49,6 @@ export const utility: Module = defineModule('utility', {
 
     noPingStore.set('pings', JSON.stringify(list));
     cmd.respond('success');
-  }),
-  rustexec: defineCommand('rustexec', '<channel (stable/beta/nightly)> <mode (debug/release)> <code>', 'executes a rust program using play.rust-lang.org/execute', (cmd) => {
-    if (cmd.args.length < 3) throw CommandErrorId.NotEnoughArguments;
-    const params = {
-      backtrace: false,
-      channel: cmd.args[0],
-      code: replaceAll(replaceAll(cmd.args.slice(2).join(' '), '\\n', '\n'), '\\t', '\t'),
-      crateType: 'bin',
-      edition: '2021',
-      mode: cmd.args[1],
-      tests: false,
-    };
-
-    axios
-      .post(`https://play.rust-lang.org/execute`, JSON.stringify(params), {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      .then((response) => {
-        cmd.respond(response.data.success ? 'Success' : 'Failure', true);
-        if (response.data.stdout) cmd.respond('--- STDOUT ---', true);
-        if (response.data.stdout)
-          cmd.respond(
-            response.data.stdout
-              .split('\n')
-              .slice(0, 5)
-              .map((v: string) => `> ${v}`)
-              .join('\n'),
-            true
-          );
-        if (response.data.stderr) cmd.respond('--- STDERR ---', true);
-        if (response.data.stderr)
-          cmd.respond(
-            response.data.stderr
-              .split('\n')
-              .slice(0, 5)
-              .map((v: string) => `> ${v}`)
-              .join('\n'),
-            true
-          );
-      })
-      .catch((reason) => {
-        Logger.error('rust', reason);
-      });
   }),
   uptime: defineCommand('uptime', '', 'shows how much the bot has been running', (cmd) => {
     cmd.respond(`${Math.floor(process.uptime())}s`);
