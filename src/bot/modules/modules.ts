@@ -44,23 +44,19 @@ export interface ModuleContents {
   [name: string]: Command;
 }
 
-export type ModuleEvent = 'registered' | 'join';
-
-export type ModuleListeners = [ModuleEvent, (bot: Bot, ...args: any[]) => void][];
-
 export interface Module {
   name: string;
   help: string;
   contents: ModuleContents;
-  listeners?: ModuleListeners;
+  register?: (bot: Bot) => void;
 }
 
-export function defineModule(name: string, help: string, contents: ModuleContents, listeners?: ModuleListeners): Module {
+export function defineModule(name: string, help: string, contents: ModuleContents, register?: (bot: Bot) => void): Module {
   return {
     name,
     contents,
     help,
-    listeners,
+    register,
   };
 }
 
@@ -84,23 +80,7 @@ function loadModule(mod: Module, bot: Bot) {
     commands[key] = value;
   }
 
-  if (!mod.listeners) return;
-  for (const listener of mod.listeners) {
-    switch (listener[0]) {
-      case 'registered':
-        bot.client.client.on('registered', (message) => {
-          listener[1](bot, message);
-        });
-        break;
-      case 'join':
-        bot.client.client.on('join', (channel, nick, message) => {
-          listener[1](bot, channel, nick, message);
-        });
-        break;
-      default:
-        break;
-    }
-  }
+  if (mod.register) mod.register(bot);
 }
 
 function isCmdErr(e: any): e is CmdErr {
