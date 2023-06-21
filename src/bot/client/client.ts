@@ -5,6 +5,7 @@ import { Irc, IrcClient, WhoisInfo } from './irc';
 const irc: Irc = require('irc');
 
 export class Client {
+  questionTimeout: number = 60 * 1000;
   client: IrcClient;
   private questionCallbackTable: Record<string, (answer: string) => void> = {};
   private learntQuestioning: string[] = [];
@@ -94,7 +95,14 @@ export class Client {
 
   private questionCb(nick: string, callback: (answer: string) => void, loc: string, question: string): void {
     this.client.say(loc, `${nick} ?> ${question}${this.learntQuestioning.includes(nick) ? '' : '\nRespond by saying "A> [your answer here]"'}`);
-    this.questionCallbackTable[nick] = callback;
+    const timeid = setTimeout(() => {
+      delete this.questionCallbackTable[nick];
+      this.client.say(nick, `Timeout for question: ${question}`);
+    }, this.questionTimeout);
+    this.questionCallbackTable[nick] = (ans) => {
+      clearTimeout(timeid);
+      callback(ans);
+    };
   }
 
   async question(nick: string, question: string, loc: string = nick): Promise<string> {

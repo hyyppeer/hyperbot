@@ -19,7 +19,8 @@ export const repl: Module = defineModule('repl', 'see help for command', {
               resolve(eval(src));
               break;
             case 'sh':
-              resolve(await Shell.exec(src));
+              const result = await Shell.exec(src);
+              resolve(`${result[1]}: ${result[0]}`);
               break;
             case 'ext':
               resolve(Extension.execute(src, cmd.bot, cmd));
