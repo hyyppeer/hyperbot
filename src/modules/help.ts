@@ -32,6 +32,6 @@ export const help: Module = defineModule('help', {
   }),
   help: defineCommand('help', '[<command>]', 'get help about a specific command/topic or list all commands and topics', (cmd) => {
     if (cmd.arg) cmd.respond(getHelp(cmd.arg, cmd));
-    else cmd.respond('Use ,modules to get a list of modules, use ,help <command> to get help on a command');
+    else cmd.respond(`Use ${config.bot.prefix}modules to get a list of modules, use ${config.bot.prefix}help <command> to get help on a command`);
   }),
 });
