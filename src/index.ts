@@ -12,6 +12,7 @@ export const bundle = readBundle('D:/hyperbot-town-irc/config/bundle.conf');
 export const noPingStore = new Store('noping');
 export const lastSeenStore = new Store('lastseen');
 export const reminderStore = new Store('reminders');
+export const duckStore = new Store('duck');
 
 async function start() {
   Logger.level = LogLevel.Debug;

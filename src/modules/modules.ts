@@ -1,3 +1,4 @@
+import { types } from 'util';
 import { Bot, Rank } from '../bot/bot';
 import { bundle, config, noPingStore } from '../index';
 import { Logger } from '../util/logger';
@@ -30,6 +31,7 @@ export interface CmdApi {
   ask(question: string, timeout?: string | Function): Promise<string>;
   confirm(confirmation?: string): Promise<boolean>;
   user?: string;
+  identify(): Promise<string>;
 }
 
 interface Command {
@@ -123,7 +125,10 @@ function call(cmd: CmdApi, command: string) {
 
   if (commandobj.authenticate(cmd)) {
     try {
-      commandobj.run(cmd);
+      const returned = commandobj.run(cmd);
+      if (types.isPromise(returned)) {
+        returned.catch((reason) => handleCallError(reason, cmd));
+      }
     } catch (e) {
       handleCallError(e, cmd);
     }
@@ -169,6 +174,17 @@ function createApi(nick: string, to: string, text: string, bot: Bot, op: Rank, u
       return (await this.ask(confirmation || 'Are you sure?')).toLowerCase().startsWith('y') ? true : false;
     },
     user,
+    async identify() {
+      return new Promise((resolve) => {
+        if (!bot.users[nick]) {
+          bot.client.whois(nick).then((info) => {
+            bot.users[nick] = info.user;
+            this.user = info.user;
+            resolve(info.user);
+          });
+        } else resolve(bot.users[nick]);
+      });
+    },
   };
 }
 

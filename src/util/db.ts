@@ -22,4 +22,8 @@ export class Store {
   save() {
     writeFileSync(this.path, JSON.stringify(this.data));
   }
+
+  get object() {
+    return this.data;
+  }
 }

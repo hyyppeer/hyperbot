@@ -12,6 +12,7 @@ import { reminders } from '../modules/reminders';
 import { repl } from '../modules/repl';
 import { help } from '../modules/help';
 import { rust } from '../modules/rust';
+import { ducks } from '../modules/ducks';
 
 export enum Rank {
   User = 0,
@@ -34,7 +35,7 @@ export class Bot {
   } = {};
   constructor(config: Config, bundle: Bundle) {
     this.client = new Client(config.conn.server, config.conn.port, config.branding.name, config.conn.secure, config.bot.channels, config.branding.username, config.branding.realname);
-    init([utility, moderation, fun, social, packages, reminders, repl, help, rust /*, tips*/], this);
+    init([utility, moderation, fun, social, packages, reminders, repl, help, rust, ducks /*, tips*/], this);
 
     this.client.client.on('message', async (nick, to, text) => {
       await handle(nick, to, text, this, this.oprank(nick, to), this.users[nick]);

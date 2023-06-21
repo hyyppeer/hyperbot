@@ -13,7 +13,7 @@ https://github.com/bitbot-irc/bitbot/tree/master/modules is a great source for i
 [X] instead of cmd.fail and cmd.assert, running commands should be in a try-catch and commands throw errors instead of using cmd.fail. the fail message should be the same
 [X] last online command
 [] map package ids to package data instead of showing package data (problematic)
-[] something likes ducks for tilde.town irc
+[X] something likes ducks for tilde.town irc
 [] leaderboard for it (shows top 10)
 [] polls
 [X] reminders to remind users (arguments: text, duration)
