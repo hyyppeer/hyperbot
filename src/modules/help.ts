@@ -32,6 +32,12 @@ export const help: Module = defineModule('help', {
   }),
   help: defineCommand('help', '[<command>]', 'get help about a specific command/topic or list all commands and topics', (cmd) => {
     if (cmd.arg) cmd.respond(getHelp(cmd.arg, cmd));
-    else cmd.respond(`Use ${config.bot.prefix}modules to get a list of modules, use ${config.bot.prefix}help <command> to get help on a command`);
+    else cmd.respond(`Use ${config.bot.prefix}modules to get a list of modules, use ${config.bot.prefix}commands <module> to get a list of commands in a module, use ${config.bot.prefix}help <command> to get help on a command`);
+  }),
+  commands: defineCommand('commands', '<module>', 'get list of commands in a module', (cmd) => {
+    if (!cmd.arg) throw 'No module provided';
+
+    if (modules[cmd.arg]) cmd.respond(Object.keys(modules[cmd.arg].contents).join(' '));
+    else cmd.respond('No such module :(');
   }),
 });

@@ -40,15 +40,6 @@ export const ducks: Module = defineModule(
       const ducks = Number.parseInt(val);
       cmd.respond(`You have ${ducks} ducks in ${config.ducks.channel}!`);
     }),
-    add: defineCommand(
-      'add',
-      '',
-      'adds a duck (for testing)',
-      (cmd) => {
-        addDuck(cmd.bot);
-      },
-      (cmd) => cmd.op >= Rank.Admin
-    ),
   },
   (bot) => {
     setInterval(() => addDuck(bot), 15 * 60 * 1000);
