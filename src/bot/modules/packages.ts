@@ -33,10 +33,13 @@ export const packages: Module = defineModule('packages', 'packages are simple mo
     'createpkg',
     'create a package, you will be asked to enter info about it',
     async (cmd) => {
+      const fail = () => {
+        throw 'timeout';
+      };
       if (cmd.channel.startsWith('#')) throw 'Sorry, createpkg is only allowed in PMs to prevent spam.';
       cmd.respond('Please note: only ASCII characters are allowed in these fields');
-      const name = await cmd.ask('What would you like to name your package?');
-      const help = await cmd.ask('Please enter a help string for your package.');
+      const name = await cmd.ask('What would you like to name your package?', fail);
+      const help = await cmd.ask('Please enter a help string for your package.', fail);
       let commands: JsonCommand[] = [];
 
       while (true) {
@@ -44,17 +47,17 @@ export const packages: Module = defineModule('packages', 'packages are simple mo
           break;
         }
 
-        const name = await cmd.ask('What would you like to name this command?');
-        const syntax = await cmd.ask('What is the syntax to use this command?');
-        const help = await cmd.ask('What is the help for this command?');
-        const rank = Number.parseInt(await cmd.ask('What is the minimum rank to use this command? (1-3)'));
+        const name = await cmd.ask('What would you like to name this command?', fail);
+        const syntax = await cmd.ask('What is the syntax to use this command?', fail);
+        const help = await cmd.ask('What is the help for this command?', fail);
+        const rank = Number.parseInt(await cmd.ask('What is the minimum rank to use this command? (1-3)', fail));
         const listeners: JsonCmdListener[] = [];
         while (true) {
           if (!(await cmd.confirm('Would you like to add a listener? (y/N)'))) {
             break;
           }
 
-          const onans = await cmd.ask('When would you like this command to be triggered? (ran)');
+          const onans = await cmd.ask('When would you like this command to be triggered? (ran)', fail);
           const on = onans === 'ran' ? onans : 'ran';
 
           const actions: JsonCmdAction[] = [];
@@ -63,7 +66,7 @@ export const packages: Module = defineModule('packages', 'packages are simple mo
               break;
             }
 
-            const typea = await cmd.ask('What is the type of this action? (say/do)');
+            const typea = await cmd.ask('What is the type of this action? (say/do)', fail);
             const type: JsonCmdActionType = typea === 'do' ? typea : 'say';
 
             const argarr: string[] = [];
@@ -72,7 +75,7 @@ export const packages: Module = defineModule('packages', 'packages are simple mo
                 break;
               }
 
-              const arg = await cmd.ask('Please enter the argument.');
+              const arg = await cmd.ask('Please enter the argument.', fail);
               argarr.push(arg);
             }
             actions.push({

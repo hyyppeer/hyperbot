@@ -32,7 +32,7 @@ export const repl: Module = defineModule('repl', 'see help for command', {
       };
 
       while (true) {
-        const answer = await cmd.ask('Enter your statement (.exit to exit the repl)');
+        const answer = await cmd.ask('Enter your statement (.exit to exit the repl)', '.exit');
         if (answer === '.exit') {
           break;
         }

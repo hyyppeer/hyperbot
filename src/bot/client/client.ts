@@ -93,11 +93,13 @@ export class Client {
     });
   }
 
-  private questionCb(nick: string, callback: (answer: string) => void, loc: string, question: string): void {
+  private questionCb(nick: string, callback: (answer: string) => void, loc: string, question: string, timeout: string | Function): void {
     this.client.say(loc, `${nick} ?> ${question}${this.learntQuestioning.includes(nick) ? '' : '\nRespond by saying "A> [your answer here]"'}`);
     const timeid = setTimeout(() => {
       delete this.questionCallbackTable[nick];
       this.client.say(nick, `Timeout for question: ${question}`);
+      if (typeof timeout === 'string') callback(timeout);
+      else callback(timeout());
     }, this.questionTimeout);
     this.questionCallbackTable[nick] = (ans) => {
       clearTimeout(timeid);
@@ -105,9 +107,9 @@ export class Client {
     };
   }
 
-  async question(nick: string, question: string, loc: string = nick): Promise<string> {
+  async question(nick: string, question: string, timeout: string | Function = '', loc: string = nick): Promise<string> {
     return new Promise((resolve) => {
-      this.questionCb(nick, resolve, loc, question);
+      this.questionCb(nick, resolve, loc, question, timeout);
     });
   }
 }

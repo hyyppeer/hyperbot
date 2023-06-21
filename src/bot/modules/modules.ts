@@ -27,7 +27,7 @@ export interface CmdApi {
   bot: Bot;
   channel: string;
   responseLoc: string;
-  ask(question: string): Promise<string>;
+  ask(question: string, timeout?: string | Function): Promise<string>;
   confirm(confirmation?: string): Promise<boolean>;
   user?: string;
 }
@@ -184,8 +184,8 @@ function createApi(nick: string, to: string, text: string, bot: Bot, prefix: str
     bot,
     channel: to,
     responseLoc: responseLocation,
-    async ask(question) {
-      return bot.client.question(nick, question, responseLocation);
+    async ask(question, timeout) {
+      return bot.client.question(nick, question, timeout || '', responseLocation);
     },
     async confirm(confirmation?: string) {
       return (await this.ask(confirmation || 'Are you sure?')).toLowerCase().startsWith('y') ? true : false;
