@@ -1,6 +1,5 @@
 import { Bot } from './bot/bot';
 import { Cli } from './bot/services/cli';
-import { Dashboard } from './bot/services/dashboard/dashboard';
 import { Reminder } from './bot/services/reminders';
 import { Shell } from './bot/services/town/shell';
 import { readBundle, readConfig } from './util/config';
@@ -20,10 +19,8 @@ async function start() {
   await Shell.start();
   const bot = new Bot(config, bundle);
   const cli = new Cli(bot);
-  const dashboard = new Dashboard(bot);
 
-  dashboard.listen();
-  Reminder.init(bot)
+  Reminder.init(bot);
 
   process.on('uncaughtException', (error, origin) => {
     Logger.error('process', `Uncaught exception has occurred: ${error.name}: ${error.message} (from ${origin})\n${error.stack}`);

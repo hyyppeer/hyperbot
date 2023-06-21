@@ -7,22 +7,17 @@
   "scripts": {
     "start": "npm run compile && npm run run",
     "compile": "tsc",
-    "run": "node dist/index.js",
-    "scss:watch": "sass --watch src/bot/services/dashboard/public/scss:src/bot/services/dashboard/public/css",
-    "dashboard:watch": "tsc -w -p src/bot/services/dashboard/public/tsconfig.json"
+    "run": "node dist/index.js"
   },
   "author": "hyper",
   "license": "ISC",
   "dependencies": {
     "axios": "^1.4.0",
-    "body-parser": "^1.20.2",
     "chalk": "^4.1.2",
-    "express": "^4.18.2",
     "irc": "^0.5.2",
     "ssh2": "^1.13.0"
   },
   "devDependencies": {
-    "@types/express": "^4.17.17",
     "@types/node": "^20.3.1",
     "@types/ssh2": "^1.11.11",
     "typescript": "^5.0.4"

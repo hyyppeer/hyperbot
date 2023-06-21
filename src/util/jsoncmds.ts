@@ -26,7 +26,6 @@ export interface JsonCommand {
 
 export interface JsonPackage {
   name: string;
-  help: string;
   commands: JsonCommand[];
 }
 
@@ -127,7 +126,7 @@ export class JsonCommands {
       commands[command.name] = contents[command.name];
     });
 
-    modules[pkg.name] = defineModule(pkg.name, pkg.help, contents);
+    modules[pkg.name] = defineModule(pkg.name, contents);
   }
 
   static unloadPackage(pkgstr: string) {

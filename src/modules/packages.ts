@@ -39,7 +39,6 @@ export const packages: Module = defineModule('packages', {
       if (cmd.channel.startsWith('#')) throw 'Sorry, createpkg is only allowed in PMs to prevent spam.';
       cmd.respond('Please note: only ASCII characters are allowed in these fields');
       const name = await cmd.ask('What would you like to name your package?', fail);
-      const help = await cmd.ask('Please enter a help string for your package.', fail);
       let commands: JsonCommand[] = [];
 
       while (true) {
@@ -99,7 +98,6 @@ export const packages: Module = defineModule('packages', {
 
       const pkg: JsonPackage = {
         name,
-        help,
         commands,
       };
 
