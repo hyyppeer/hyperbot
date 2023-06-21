@@ -1,4 +1,4 @@
-import { Message } from '../client/irc';
+import { Message } from '../bot/client/irc';
 import { Module, defineModule } from './modules';
 
 const tipsarr: string[] = `You can use -rustexec to run rust programs!

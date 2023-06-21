@@ -1,4 +1,4 @@
-import { Reminder } from '../services/reminders';
+import { Reminder } from '../bot/services/reminders';
 import { CommandErrorId, Module, defineCommand, defineModule } from './modules';
 
 export const reminders: Module = defineModule('reminders', 'commands related to reminding you', {

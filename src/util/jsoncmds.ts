@@ -1,5 +1,5 @@
 import { Rank } from '../bot/bot';
-import { CmdApi, commands, defineCommand, defineModule, ModuleContents, modules } from '../bot/modules/modules';
+import { CmdApi, commands, defineCommand, defineModule, ModuleContents, modules } from '../modules/modules';
 import { Logger } from './logger';
 
 export type JsonCmdActionType = 'say' | 'do';

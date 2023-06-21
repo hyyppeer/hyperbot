@@ -1,6 +1,6 @@
-import { Extension } from '../../util/ext';
-import { Rank } from '../bot';
-import { Shell } from '../services/town/shell';
+import { Extension } from '../util/ext';
+import { Rank } from '../bot/bot';
+import { Shell } from '../bot/services/town/shell';
 import { CommandErrorId, Module, defineCommand, defineModule } from './modules';
 
 export const repl: Module = defineModule('repl', 'see help for command', {

@@ -1,4 +1,4 @@
-import { Rank } from '../bot';
+import { Rank } from '../bot/bot';
 import { CommandErrorId, defineCommand, defineModule, Module } from './modules';
 
 export const moderation: Module = defineModule('moderation', 'moderation commands', {

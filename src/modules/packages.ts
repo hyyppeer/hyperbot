@@ -1,10 +1,10 @@
 import { readFileSync, writeFileSync } from 'fs';
-import { JsonCmdAction, JsonCmdActionType, JsonCmdListener, JsonCommand, JsonCommands, JsonPackage } from '../../util/jsoncmds';
-import { Rank } from '../bot';
+import { JsonCmdAction, JsonCmdActionType, JsonCmdListener, JsonCommand, JsonCommands, JsonPackage } from '../util/jsoncmds';
+import { Rank } from '../bot/bot';
 import { CommandErrorId, Module, defineCommand, defineModule } from './modules';
-import { Logger } from '../../util/logger';
-import { config } from '../..';
-import { Shell } from '../services/town/shell';
+import { Logger } from '../util/logger';
+import { config } from '..';
+import { Shell } from '../bot/services/town/shell';
 import { randomBytes } from 'crypto';
 
 export const packages: Module = defineModule('packages', 'packages are simple modules created by users', {

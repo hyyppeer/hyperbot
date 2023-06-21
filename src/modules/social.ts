@@ -1,4 +1,4 @@
-import { lastSeenStore } from '../..';
+import { lastSeenStore } from '..';
 import { CommandErrorId, defineCommand, defineModule, Module } from './modules';
 
 export const social: Module = defineModule('social', 'commands for people people', {

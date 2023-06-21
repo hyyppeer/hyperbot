@@ -1,6 +1,6 @@
-import { Bot, Rank } from '../bot';
-import { bundle, config, noPingStore } from '../../index';
-import { Logger } from '../../util/logger';
+import { Bot, Rank } from '../bot/bot';
+import { bundle, config, noPingStore } from '../index';
+import { Logger } from '../util/logger';
 import chalk from 'chalk';
 
 export enum CommandErrorId {

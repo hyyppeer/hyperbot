@@ -1,5 +1,5 @@
 import { Bot } from '../bot/bot';
-import * as modules from '../bot/modules/modules';
+import * as modules from '../modules/modules';
 import { Shell } from '../bot/services/town/shell';
 import { Logger } from './logger';
 

@@ -1,11 +1,11 @@
-import { Shell } from '../services/town/shell';
-import { Rank } from '../bot';
+import { Shell } from '../bot/services/town/shell';
+import { Rank } from '../bot/bot';
 import { commands, defineCommand, defineModule, Module, CmdApi, modules, CommandErrorId } from './modules';
-import { noPingStore } from '../..';
+import { noPingStore } from '..';
 import axios from 'axios';
-import { Logger } from '../../util/logger';
-import { replaceAll } from '../../util/polyfills';
-import { Extension } from '../../util/ext';
+import { Logger } from '../util/logger';
+import { replaceAll } from '../util/polyfills';
+import { Extension } from '../util/ext';
 
 const topics: Record<string, string | ((cmd: CmdApi) => string)> = {
   'getting-started': 'use help to get a list of commands then help <command> to get info about a specific command, good luck on your journey!',

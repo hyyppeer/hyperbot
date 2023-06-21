@@ -1,15 +1,15 @@
 import { Client } from './client/client';
 import { Config, Bundle } from '../util/config';
 import { Logger } from '../util/logger';
-import { fun } from './modules/fun';
-import { moderation } from './modules/moderation';
-import { handle, init } from './modules/modules';
-import { utility } from './modules/utility';
-import { social } from './modules/social';
+import { fun } from '../modules/fun';
+import { moderation } from '../modules/moderation';
+import { handle, init } from '../modules/modules';
+import { utility } from '../modules/utility';
+import { social } from '../modules/social';
 import { LastSeen } from './services/lastseen';
-import { packages } from './modules/packages';
-import { reminders } from './modules/reminders';
-import { repl } from './modules/repl';
+import { packages } from '../modules/packages';
+import { reminders } from '../modules/reminders';
+import { repl } from '../modules/repl';
 
 export enum Rank {
   User = 0,

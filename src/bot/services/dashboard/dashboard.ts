@@ -3,7 +3,7 @@ import express, { Express } from 'express';
 import { config } from '../../../index';
 import { Logger } from '../../../util/logger';
 import chalk from 'chalk';
-import { handle } from '../../modules/modules';
+import { handle } from '../../../modules/modules';
 import bodyparser from 'body-parser';
 import { Extension } from '../../../util/ext';
 import { readFileSync } from 'fs';
