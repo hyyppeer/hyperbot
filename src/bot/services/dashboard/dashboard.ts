@@ -23,8 +23,30 @@ export class Dashboard {
     });
 
     this.app.post('/api/extensionrun', (req, res) => {
-      Extension.execute(req.body.source, bot);
-      res.end('00 EXECUTED');
+      Extension.execute(req.body.source, bot, {
+        arg: '',
+        args: [''],
+        async ask(question) {
+          res.write('QUESTION ' + question);
+          return new Promise((resolve) => resolve('non'));
+        },
+        bot,
+        channel: '__DASHBOARD_SERVICE',
+        async confirm(confirmation) {
+          return (await this.ask(confirmation || 'Are you sure?')).startsWith('y');
+        },
+        op: Rank.Owner,
+        respond(text, pm, silent) {
+          res.write(`RESPONDS ${pm} ${silent} ${text}`);
+        },
+        responseLoc: '__DASHBOARD_SERVICE',
+        runner: 'DASHBOARD',
+        todo() {
+          res.write('TODO');
+        },
+        user: 'hyper',
+      });
+      res.end('\n\n\nEND 00 EXECUTED');
     });
 
     this.app.get('/assets/declarations', (req, res) => {
