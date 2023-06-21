@@ -1,5 +1,6 @@
 import { Rank } from '../bot/bot';
 import { CmdApi, commands, defineCommand, defineModule, ModuleContents, modules } from '../bot/modules/modules';
+import { Logger } from './logger';
 
 export type JsonCmdActionType = 'say' | 'do';
 
@@ -29,17 +30,57 @@ export interface JsonPackage {
   commands: JsonCommand[];
 }
 
+export interface PackFunctions {
+  [name: string]: (cmd: CmdApi, ...args: string[]) => string | void;
+}
+
+const packfns: PackFunctions = {
+  pipe(cmd, ...args) {
+    const arg = args.join(',');
+    const stats = arg.split('|').map((v) => v.split(','));
+    let val = '';
+    stats.forEach((stat) => {
+      const out = packfns[stat[0]](cmd, ...stat.slice(1));
+      val = out ? out : val;
+    });
+    return val;
+  },
+  join(cmd, ...args) {
+    if (args.length < 2) throw 'You must enter a joiner and a list';
+    return args.slice(1).join(args[0]);
+  },
+  say(cmd, ...args) {
+    cmd.respond(args.join(','));
+  },
+  void(cmd, ...args) {
+    packfns[args[0]](cmd, ...args.slice(1));
+  },
+};
+
 function parseArgArr(arr: string[], cmd: CmdApi): string {
   const variables: Record<string, any> = {
     user: cmd.runner,
     argstr: cmd.arg,
+    arg0: cmd.args[0],
+    arg1: cmd.args[1],
+    arg2: cmd.args[2],
+    arglen: cmd.args.length,
   };
 
   let parts: string[] = [];
 
   arr.forEach((value) => {
     if (value.startsWith('$$')) {
-      parts.push(variables[value.substring(2)]);
+      parts.push(variables[value.substring(2)] || value);
+    } else if (value.startsWith('$!')) {
+      const arg = value.split(',');
+      try {
+        const out = packfns[arg[0]](cmd, ...arg.slice(1));
+        if (out) parts.push(out);
+      } catch (e) {
+        parts.push(value);
+        Logger.error('jsoncmds', `Error evaluating $!: ${e}`);
+      }
     } else {
       parts.push(value);
     }
@@ -87,6 +128,15 @@ export class JsonCommands {
     });
 
     modules[pkg.name] = defineModule(pkg.name, pkg.help, contents);
+  }
+
+  static unloadPackage(pkgstr: string) {
+    const pkg: JsonPackage = JSON.parse(this.decompress(pkgstr));
+
+    delete modules[pkg.name];
+    pkg.commands.forEach((command) => {
+      delete commands[command.name];
+    });
   }
 
   static compress(uncompressed: string): string {

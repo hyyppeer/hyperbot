@@ -8,15 +8,15 @@ export class Client {
   client: IrcClient;
   private questionCallbackTable: Record<string, (answer: string) => void> = {};
   private learntQuestioning: string[] = [];
-  constructor(server: string, port: number, nickname: string, secure: boolean, channels: string[]) {
+  constructor(server: string, port: number, nickname: string, secure: boolean, channels: string[], username?: string, realname?: string) {
     Logger.info('client', `connecting to ${chalk.redBright(`${server}:${port}`)} as ${chalk.greenBright(nickname)} (secure? ${secure ? chalk.greenBright('yes') : chalk.redBright('no')}) in ${channels.join(' ')}`);
     this.client = new irc.Client(server, nickname, {
       channels,
       port,
       secure,
       autoConnect: true,
-      userName: nickname,
-      realName: nickname,
+      userName: username || nickname,
+      realName: realname || nickname,
       floodProtection: true,
     });
 

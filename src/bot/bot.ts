@@ -7,6 +7,8 @@ import { handle, init } from './modules/modules';
 import { utility } from './modules/utility';
 import { social } from './modules/social';
 import { LastSeen } from './services/lastseen';
+import { packages } from './modules/packages';
+import { reminders } from './modules/reminders';
 
 export enum Rank {
   User = 0,
@@ -18,6 +20,7 @@ export enum Rank {
 export class Bot {
   client: Client;
   connected: boolean = false;
+  users: Record<string, string> = {};
   private ops: {
     [name: string]: Rank;
   } = {};
@@ -27,11 +30,16 @@ export class Bot {
     };
   } = {};
   constructor(config: Config, bundle: Bundle) {
-    this.client = new Client(config.conn.server, config.conn.port, config.branding.name, config.conn.secure, config.bot.channels);
-    init([utility, moderation, fun, social]);
+    this.client = new Client(config.conn.server, config.conn.port, config.branding.name, config.conn.secure, config.bot.channels, config.branding.username, config.branding.realname);
+    init([utility, moderation, fun, social, packages, reminders], this);
 
     this.client.client.on('message', async (nick, to, text) => {
-      await handle(nick, to, text, this, '-', this.oprank(nick, to));
+      await handle(nick, to, text, this, '-', this.oprank(nick, to), this.users[nick]);
+      if (!this.users[nick]) {
+        this.client.whois(nick).then((info) => {
+          this.users[nick] = info.user;
+        });
+      }
     });
     this.client.client.on('join', (channel, nick) => {
       LastSeen.seen(nick);
@@ -42,6 +50,7 @@ export class Bot {
     });
     this.client.client.on('quit', (nick) => {
       if (this.ops[nick]) delete this.ops[nick];
+      if (this.users[nick]) delete this.users[nick];
     });
     this.client.client.on('registered', () => {
       this.connected = true;
@@ -76,7 +85,6 @@ export class Bot {
   }
 
   scanchan(channel: string) {
-    Logger.verbose('lastseen', `Scanning channel ${channel}`);
     const users = Object.keys(this.client.client.chans[channel].users);
     LastSeen.seeall(users);
   }

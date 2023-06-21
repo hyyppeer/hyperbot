@@ -3,8 +3,22 @@ import { bundle, config, noPingStore } from '../../index';
 import { Logger } from '../../util/logger';
 import chalk from 'chalk';
 
+export enum CommandErrorId {
+  RequiresIdentification,
+  Forbidden,
+  NotEnoughArguments,
+  InvalidArguments,
+  InternalFailure,
+}
+
+export interface CmdErr {
+  id: CommandErrorId;
+  desc: string;
+  code?: string;
+}
+
 export interface CmdApi {
-  respond(text: string, pm?: boolean): void;
+  respond(text: string, pm?: boolean, silent?: boolean): void;
   runner: string;
   args: Array<string>;
   arg: string;
@@ -15,6 +29,7 @@ export interface CmdApi {
   responseLoc: string;
   ask(question: string): Promise<string>;
   confirm(confirmation?: string): Promise<boolean>;
+  user?: string;
 }
 
 interface Command {
@@ -29,17 +44,23 @@ export interface ModuleContents {
   [name: string]: Command;
 }
 
+export type ModuleEvent = 'registered' | 'join';
+
+export type ModuleListeners = [ModuleEvent, (bot: Bot, ...args: any[]) => void][];
+
 export interface Module {
   name: string;
   help: string;
   contents: ModuleContents;
+  listeners?: ModuleListeners;
 }
 
-export function defineModule(name: string, help: string, contents: ModuleContents): Module {
+export function defineModule(name: string, help: string, contents: ModuleContents, listeners?: ModuleListeners): Module {
   return {
     name,
     contents,
     help,
+    listeners,
   };
 }
 
@@ -53,18 +74,65 @@ export function defineCommand(name: string, syntax: string, help: ((cmd: CmdApi)
   };
 }
 
-function rollcall(cmd: CmdApi) {
-  cmd.respond(bundle['rollcall.response'](config.branding.name, config.branding.owner));
-}
-
 export const commands: Record<string, Command> = {};
 export const modules: Record<string, Module> = {};
 
-function loadModule(mod: Module) {
+function loadModule(mod: Module, bot: Bot) {
   Logger.debug('modules', `Loading module: ${chalk.greenBright(mod.name)}`);
   modules[mod.name] = mod;
   for (const [key, value] of Object.entries(mod.contents)) {
     commands[key] = value;
+  }
+
+  if (!mod.listeners) return;
+  for (const listener of mod.listeners) {
+    switch (listener[0]) {
+      case 'registered':
+        bot.client.client.on('registered', (message) => {
+          listener[1](bot, message);
+        });
+        break;
+      case 'join':
+        bot.client.client.on('join', (channel, nick, message) => {
+          listener[1](bot, channel, nick, message);
+        });
+        break;
+      default:
+        break;
+    }
+  }
+}
+
+function isCmdErr(e: any): e is CmdErr {
+  return e.id && e.desc && typeof e.id === 'number' && typeof e.desc === 'string' && e.id >= 0;
+}
+
+function handleCallError(e: any, cmd: CmdApi) {
+  if (typeof e === 'number') {
+    switch (e) {
+      case CommandErrorId.Forbidden:
+        cmd.respond('fail: forbidden');
+        break;
+      case CommandErrorId.InvalidArguments:
+        cmd.respond('fail: arguments provided, but is not correct');
+        break;
+      case CommandErrorId.NotEnoughArguments:
+        cmd.respond('fail: not enough arguments were provided');
+        break;
+      case CommandErrorId.RequiresIdentification:
+        cmd.respond("fail: you've not been identified yet, try again in a few seconds");
+        break;
+      case CommandErrorId.InternalFailure:
+      default:
+        cmd.respond('fail: internal error');
+        break;
+    }
+  } else if (isCmdErr(e)) {
+    let desc = `fail: ${e.desc} (ERRNO${e.id})`;
+    if (e.code) desc += ` (CODE ${e.code})`;
+    cmd.respond(desc);
+  } else {
+    cmd.respond(`fail: ${e}`);
   }
 }
 
@@ -79,7 +147,7 @@ function call(cmd: CmdApi, command: string) {
     try {
       commandobj.run(cmd);
     } catch (e) {
-      cmd.respond('fail: ' + e);
+      handleCallError(e, cmd);
     }
   } else {
     cmd.respond(`Not permitted to run ${command.toLowerCase()}`);
@@ -98,12 +166,12 @@ async function nickauth(nick: string, bot: Bot) {
   }
 }
 
-function createApi(nick: string, to: string, text: string, bot: Bot, prefix: string, op: Rank): CmdApi {
+function createApi(nick: string, to: string, text: string, bot: Bot, prefix: string, op: Rank, user?: string): CmdApi {
   let responseLocation = bot.client.client.nick === to ? nick : to;
   return {
-    respond(text, pm) {
+    respond(text, pm, silent) {
       let message = text;
-      if (!JSON.parse(noPingStore.get('pings') || '[]').includes(nick) && to !== bot.client.client.nick) message = `${nick}: ${message}`;
+      if (!JSON.parse(noPingStore.get('pings') || '[]').includes(nick) && to !== bot.client.client.nick) if (!silent) message = `${nick}: ${message}`;
       bot.client.client.say(pm || false ? nick : responseLocation, message);
     },
     runner: nick,
@@ -122,11 +190,12 @@ function createApi(nick: string, to: string, text: string, bot: Bot, prefix: str
     async confirm(confirmation?: string) {
       return (await this.ask(confirmation || 'Are you sure?')).toLowerCase().startsWith('y') ? true : false;
     },
+    user,
   };
 }
 
-export async function handle(nick: string, to: string, text: string, bot: Bot, prefix: string, op: Rank) {
-  const cmd: CmdApi = createApi(nick, to, text, bot, prefix, op);
+export async function handle(nick: string, to: string, text: string, bot: Bot, prefix: string, op: Rank, user?: string) {
+  const cmd: CmdApi = createApi(nick, to, text, bot, prefix, op, user);
 
   await nickauth(nick, bot);
 
@@ -135,7 +204,7 @@ export async function handle(nick: string, to: string, text: string, bot: Bot, p
   }
 
   if (text === '!rollcall') {
-    rollcall(cmd);
+    cmd.respond(bundle['rollcall.response'](config.branding.name, config.branding.owner), false, true);
     return;
   }
 
@@ -146,6 +215,6 @@ export async function handle(nick: string, to: string, text: string, bot: Bot, p
   }
 }
 
-export function init(modules: Module[]) {
-  modules.forEach((mod) => loadModule(mod));
+export function init(modules: Module[], bot: Bot) {
+  modules.forEach((mod) => loadModule(mod, bot));
 }
