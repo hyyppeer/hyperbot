@@ -31,8 +31,7 @@ export const help: Module = defineModule('help', {
     cmd.respond(Object.keys(modules).join(' '));
   }),
   help: defineCommand('help', '[<command>]', 'get help about a specific command/topic or list all commands and topics', (cmd) => {
-    if (!cmd.arg) throw CommandErrorId.NotEnoughArguments;
-
-    cmd.respond(getHelp(cmd.arg, cmd));
+    if (cmd.arg) cmd.respond(getHelp(cmd.arg, cmd));
+    else cmd.respond('Use ,modules to get a list of modules, use ,help <command> to get help on a command');
   }),
 });
