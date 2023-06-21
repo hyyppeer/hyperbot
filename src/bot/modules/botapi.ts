@@ -1,6 +1,7 @@
+import axios from 'axios';
 import { replaceAll } from '../../util/polyfills';
 import { Bot } from '../bot';
-import { Module, defineModule } from './modules';
+import { Module, defineCommand, defineModule } from './modules';
 
 interface Command {
   run: (i: Interface, ...args: string[]) => void;
@@ -29,6 +30,9 @@ class Interface {
   fail(message: string, code: FailCode) {
     this.response('fail', code.toString(), message);
   }
+  result(...messages: string[]) {
+    this.response('result', ...messages);
+  }
 
   response(...args: string[]) {
     const [prefix, ...arg] = args.map((v) => v.replace('~~', '\\~~'));
@@ -52,7 +56,8 @@ The data will be seperated using double ~ as normal`,
   'response-codes': `There are many response codes/commands the bot can reply with:
 info: indicates information that should be displayed to the user
 dev: indicates information that you (the developer) should see
-fail: indicates a failure in the command. the second argument will be a status code of the failure`,
+fail: indicates a failure in the command. the second argument will be a status code of the failure
+result: indicates the result of the command`,
   'status-codes': `When a response fails, it will send fail<double ~s><status code><double ~s><extra data>
 Here is a list of status codes:
 1x: internal error
@@ -70,6 +75,16 @@ const cmds: Record<string, Command> = {
     if (name) i.info(help(name));
     else i.info(`${apiInfo}\nList of all helps: ${Object.keys(helps).join(' ')}`);
   }),
+  dadjoke: mkCommand(async (i) => {
+    i.result(
+      'result',
+      await axios.get('https://icanhazdadjoke.com/', {
+        headers: {
+          Accept: 'text/plain',
+        },
+      })
+    );
+  }),
 };
 
 function call(cmd: string, args: string[], i: Interface) {
@@ -83,10 +98,20 @@ function handle(text: string, i: Interface) {
   call(command, args, i);
 }
 
-export const botapi: Module = defineModule('botapi', 'defines a set of commands that allows other bots to interact with it, pm the bot %%help for info', {}, (bot) => {
-  bot.client.client.on('pm', (nick, text) => {
-    if (!text.startsWith('%%')) return;
-    const i = new Interface(bot, nick);
-    handle(text.substring(2), i);
-  });
-});
+export const botapi: Module = defineModule(
+  'botapi',
+  'defines a set of commands that allows other bots to interact with it, pm the bot %%help for info',
+  {
+    docs: defineCommand('docs', 'docs [<name>]', 'a way to access the bot apis docs through normal commands', (cmd) => {
+      if (cmd.arg) cmd.respond(help(cmd.arg), true);
+      else cmd.respond(`${apiInfo}\nList of all helps: ${Object.keys(helps).join(' ')}`, true);
+    }),
+  },
+  (bot) => {
+    bot.client.client.on('pm', (nick, text) => {
+      if (!text.startsWith('%%')) return;
+      const i = new Interface(bot, nick);
+      handle(text.substring(2), i);
+    });
+  }
+);
