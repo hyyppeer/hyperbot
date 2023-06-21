@@ -1,4 +1,3 @@
-import { Message } from '../bot/client/irc';
 import { Module, defineModule } from './modules';
 
 const tipsarr: string[] = `You can use -rustexec to run rust programs!
@@ -12,7 +11,7 @@ function getRandomTip(): string {
   return `Tip #${id}: ${tipsarr[id]}`;
 }
 
-export const tips: Module = defineModule('tips', 'periodically provides tips to the channel', {}, (bot) =>
+export const tips: Module = defineModule('tips', {}, (bot) =>
   bot.client.client.on('join', (channel, nick) => {
     if (nick !== bot.client.client.nick) return;
 

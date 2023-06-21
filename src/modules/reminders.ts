@@ -1,8 +1,8 @@
 import { Reminder } from '../bot/services/reminders';
 import { CommandErrorId, Module, defineCommand, defineModule } from './modules';
 
-export const reminders: Module = defineModule('reminders', 'commands related to reminding you', {
-  remindme: defineCommand('remindme', 'remindme <duration (mins)> <text>', 'reminds you of something', (cmd) => {
+export const reminders: Module = defineModule('reminders', {
+  remindme: defineCommand('remindme', '<duration (mins)> <text>', 'reminds you of something', (cmd) => {
     if (cmd.args.length < 2) throw CommandErrorId.NotEnoughArguments;
     const duration = Number.parseFloat(cmd.args[0]);
     if (Number.isNaN(duration)) {

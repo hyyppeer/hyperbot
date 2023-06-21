@@ -7,10 +7,10 @@ import { config } from '..';
 import { Shell } from '../bot/services/town/shell';
 import { randomBytes } from 'crypto';
 
-export const packages: Module = defineModule('packages', 'packages are simple modules created by users', {
+export const packages: Module = defineModule('packages', {
   loadpkg: defineCommand(
     'loadpkg',
-    'loadpkg <pkg-name>',
+    '<pkg-name>',
     'load a package from json-pkgs',
     (cmd) => {
       if (!cmd.args[0]) throw CommandErrorId.NotEnoughArguments;
@@ -20,7 +20,7 @@ export const packages: Module = defineModule('packages', 'packages are simple mo
   ),
   unloadpkg: defineCommand(
     'unloadpkg',
-    'unloadpkg <pkg-name>',
+    '<pkg-name>',
     'unload a package from json-pkgs',
     (cmd) => {
       if (!cmd.args[0]) throw CommandErrorId.NotEnoughArguments;
@@ -30,7 +30,7 @@ export const packages: Module = defineModule('packages', 'packages are simple mo
   ),
   createpkg: defineCommand(
     'createpkg',
-    'createpkg',
+    '',
     'create a package, you will be asked to enter info about it',
     async (cmd) => {
       const fail = () => {
@@ -123,7 +123,7 @@ export const packages: Module = defineModule('packages', 'packages are simple mo
   ),
   loadpkgstr: defineCommand(
     'loadpkgstr',
-    'loadpkgstr <pkgstr>',
+    '<pkgstr>',
     'loads a package from its pkgstr',
     (cmd) => {
       if (!cmd.arg) throw CommandErrorId.NotEnoughArguments;
@@ -132,7 +132,7 @@ export const packages: Module = defineModule('packages', 'packages are simple mo
     },
     (cmd) => cmd.op >= Rank.Owner
   ),
-  unloadpkgstr: defineCommand('unloadpkgstr', 'unloadpkgstr <pkgstr>', 'unloads a package from its package string', (cmd) => {
+  unloadpkgstr: defineCommand('unloadpkgstr', '<pkgstr>', 'unloads a package from its package string', (cmd) => {
     if (!cmd.arg) throw CommandErrorId.NotEnoughArguments;
 
     JsonCommands.unloadPackage(cmd.arg);

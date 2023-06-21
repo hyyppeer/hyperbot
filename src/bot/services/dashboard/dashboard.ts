@@ -18,7 +18,7 @@ export class Dashboard {
     this.app.use(bodyparser.json());
 
     this.app.post('/api/eval', async (req, res) => {
-      handle(req.body.nick || 'dashboard-svc', req.body.channel || Object.keys(bot.client.client.chans)[0], `-eval ${req.body.script}`, bot, req.body.prefix || '-', req.body.rank || Rank.Owner);
+      handle(req.body.nick || 'dashboard-svc', req.body.channel || Object.keys(bot.client.client.chans)[0], `-eval ${req.body.script}`, bot, req.body.rank || Rank.Owner, 'hyper');
       res.end('01 DOING');
     });
 

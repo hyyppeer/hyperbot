@@ -1,45 +1,16 @@
 import { Shell } from '../bot/services/town/shell';
 import { Rank } from '../bot/bot';
-import { commands, defineCommand, defineModule, Module, CmdApi, modules, CommandErrorId } from './modules';
+import { defineCommand, defineModule, Module, CommandErrorId } from './modules';
 import { noPingStore } from '..';
 import axios from 'axios';
 import { Logger } from '../util/logger';
 import { replaceAll } from '../util/polyfills';
 import { Extension } from '../util/ext';
 
-const topics: Record<string, string | ((cmd: CmdApi) => string)> = {
-  'getting-started': 'use help to get a list of commands then help <command> to get info about a specific command, good luck on your journey!',
-  commands: () => {
-    const list = Object.keys(commands);
-
-    return `here is a list of all commands: ${list.join(' ')}`;
-  },
-};
-
-function help(name: string, cmd: CmdApi) {
-  if (modules[name]) {
-    return `module ${name}: help: ${modules[name].help}, commands: ${Object.keys(modules[name].contents).join(' ')}`;
-  } else if (commands[name]) {
-    return `command ${name}: syntax: ${commands[name].syntax}, help: ${commands[name].help(cmd)}`;
-  } else if (topics[name]) {
-    const topic = topics[name];
-    return `topic ${name}: ${typeof topic === 'string' ? topic : topic(cmd)}`;
-  } else {
-    return `${name} doesn't exist :(`;
-  }
-}
-
-export const utility: Module = defineModule('utility', 'commands for other purposes', {
-  help: defineCommand('help', 'help [<command>]', 'get help about a specific command/topic or list all commands and topics', (cmd) => {
-    if (cmd.arg) {
-      cmd.respond(help(cmd.arg, cmd));
-    } else {
-      cmd.respond(`Modules: ${Object.keys(modules).join(' ')} | Topics: ${Object.keys(topics).join(' ')}`);
-    }
-  }),
+export const utility: Module = defineModule('utility', {
   sh: defineCommand(
     'sh',
-    'sh <command>',
+    '<command>',
     'run a shell command',
     async (cmd) => {
       const [out, code] = await Shell.exec(cmd.arg);
@@ -50,14 +21,14 @@ export const utility: Module = defineModule('utility', 'commands for other purpo
   ),
   eval: defineCommand(
     'eval',
-    'eval <javascript>',
+    '<javascript>',
     'evaluate javascript code',
     (cmd) => {
       eval(cmd.arg);
     },
     (cmd) => cmd.op === Rank.Owner
   ),
-  noping: defineCommand('noping', 'noping [<true/false/yes/y/no/n/t/f>]', 'toggles/sets whether or not to ping you when responding', (cmd) => {
+  noping: defineCommand('noping', '[<true/false/yes/y/no/n/t/f>]', 'toggles/sets whether or not to ping you when responding', (cmd) => {
     const list: Array<string> = JSON.parse(noPingStore.get('pings') || '[]');
     const pinged = !list.includes(cmd.runner);
 
@@ -82,7 +53,7 @@ export const utility: Module = defineModule('utility', 'commands for other purpo
     noPingStore.set('pings', JSON.stringify(list));
     cmd.respond('success');
   }),
-  rustexec: defineCommand('rustexec', 'rustexec <channel (stable/beta/nightly)> <mode (debug/release)> <code>', 'executes a rust program using play.rust-lang.org/execute', (cmd) => {
+  rustexec: defineCommand('rustexec', '<channel (stable/beta/nightly)> <mode (debug/release)> <code>', 'executes a rust program using play.rust-lang.org/execute', (cmd) => {
     if (cmd.args.length < 3) throw CommandErrorId.NotEnoughArguments;
     const params = {
       backtrace: false,
@@ -127,7 +98,7 @@ export const utility: Module = defineModule('utility', 'commands for other purpo
         Logger.error('rust', reason);
       });
   }),
-  uptime: defineCommand('uptime', 'uptime', 'shows how much the bot has been running', (cmd) => {
+  uptime: defineCommand('uptime', '', 'shows how much the bot has been running', (cmd) => {
     cmd.respond(`${Math.floor(process.uptime())}s`);
   }),
   runext: defineCommand(

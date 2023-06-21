@@ -46,16 +46,14 @@ export interface ModuleContents {
 
 export interface Module {
   name: string;
-  help: string;
   contents: ModuleContents;
   register?: (bot: Bot) => void;
 }
 
-export function defineModule(name: string, help: string, contents: ModuleContents, register?: (bot: Bot) => void): Module {
+export function defineModule(name: string, contents: ModuleContents, register?: (bot: Bot) => void): Module {
   return {
     name,
     contents,
-    help,
     register,
   };
 }
@@ -146,7 +144,7 @@ async function nickauth(nick: string, bot: Bot) {
   }
 }
 
-function createApi(nick: string, to: string, text: string, bot: Bot, prefix: string, op: Rank, user?: string): CmdApi {
+function createApi(nick: string, to: string, text: string, bot: Bot, op: Rank, user?: string): CmdApi {
   let responseLocation = bot.client.client.nick === to ? nick : to;
   return {
     respond(text, pm, silent) {
@@ -155,8 +153,8 @@ function createApi(nick: string, to: string, text: string, bot: Bot, prefix: str
       bot.client.client.say(pm || false ? nick : responseLocation, message);
     },
     runner: nick,
-    args: text.startsWith(prefix) ? text.substring(prefix.length).split(' ').slice(1) : to === bot.client.client.nick ? text.split(' ').slice(1) : [],
-    arg: text.startsWith(prefix) ? text.substring(prefix.length).split(' ').slice(1).join(' ') : to === bot.client.client.nick ? text.split(' ').slice(1).join(' ') : '',
+    args: text.startsWith(config.bot.prefix) ? text.substring(config.bot.prefix.length).split(' ').slice(1) : to === bot.client.client.nick ? text.split(' ').slice(1) : [],
+    arg: text.startsWith(config.bot.prefix) ? text.substring(config.bot.prefix.length).split(' ').slice(1).join(' ') : to === bot.client.client.nick ? text.split(' ').slice(1).join(' ') : '',
     todo() {
       this.respond('command is todo');
     },
@@ -174,8 +172,8 @@ function createApi(nick: string, to: string, text: string, bot: Bot, prefix: str
   };
 }
 
-export async function handle(nick: string, to: string, text: string, bot: Bot, prefix: string, op: Rank, user?: string) {
-  const cmd: CmdApi = createApi(nick, to, text, bot, prefix, op, user);
+export async function handle(nick: string, to: string, text: string, bot: Bot, op: Rank, user?: string) {
+  const cmd: CmdApi = createApi(nick, to, text, bot, op, user);
 
   await nickauth(nick, bot);
 
@@ -188,8 +186,8 @@ export async function handle(nick: string, to: string, text: string, bot: Bot, p
     return;
   }
 
-  if (text.startsWith(prefix) || to === bot.client.client.nick) {
-    const cmdtext = text.startsWith(prefix) ? text.substring(prefix.length) : text;
+  if (text.startsWith(config.bot.prefix) || to === bot.client.client.nick) {
+    const cmdtext = text.startsWith(config.bot.prefix) ? text.substring(config.bot.prefix.length) : text;
     const split = cmdtext.split(' ');
     call(cmd, split[0]);
   }

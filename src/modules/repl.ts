@@ -3,10 +3,10 @@ import { Rank } from '../bot/bot';
 import { Shell } from '../bot/services/town/shell';
 import { CommandErrorId, Module, defineCommand, defineModule } from './modules';
 
-export const repl: Module = defineModule('repl', 'see help for command', {
+export const repl: Module = defineModule('repl', {
   'start-repl': defineCommand(
     'start-repl',
-    'start-repl <js/sh/ext>',
+    '<js/sh/ext>',
     'start a repl (js or shell or extension)',
     async (cmd) => {
       if (!cmd.args[0]) throw CommandErrorId.NotEnoughArguments;
