@@ -37,7 +37,7 @@ export const repl: Module = defineModule('repl', {
           break;
         }
 
-        cmd.respond(`< ${await run(answer)}`, true, true);
+        cmd.respond(`< ${await run(answer)}`, { pm: true, silent: true });
       }
       cmd.respond('Exited repl successfully.');
     },

@@ -23,8 +23,8 @@ export const rust: Module = defineModule('rust', {
         },
       })
       .then((response) => {
-        cmd.respond(response.data.success ? 'Success' : 'Failure', true);
-        if (response.data.stdout) cmd.respond('--- STDOUT ---', true);
+        cmd.respond(response.data.success ? 'Success' : 'Failure', { pm: true });
+        if (response.data.stdout) cmd.respond('--- STDOUT ---', { pm: true, silent: true });
         if (response.data.stdout)
           cmd.respond(
             response.data.stdout
@@ -32,9 +32,9 @@ export const rust: Module = defineModule('rust', {
               .slice(0, 5)
               .map((v: string) => `> ${v}`)
               .join('\n'),
-            true
+            { pm: true, silent: true }
           );
-        if (response.data.stderr) cmd.respond('--- STDERR ---', true);
+        if (response.data.stderr) cmd.respond('--- STDERR ---', { pm: true, silent: true });
         if (response.data.stderr)
           cmd.respond(
             response.data.stderr
@@ -42,7 +42,8 @@ export const rust: Module = defineModule('rust', {
               .slice(0, 5)
               .map((v: string) => `> ${v}`)
               .join('\n'),
-            true
+
+            { pm: true, silent: true }
           );
       })
       .catch((reason) => {

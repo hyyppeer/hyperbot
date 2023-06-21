@@ -18,8 +18,13 @@ export interface CmdErr {
   code?: string;
 }
 
+interface RespondOptions {
+  pm?: boolean;
+  silent?: boolean;
+}
+
 export interface CmdApi {
-  respond(text: string, pm?: boolean, silent?: boolean): void;
+  respond(text: string, opts?: RespondOptions): void;
   runner: string;
   args: Array<string>;
   arg: string;
@@ -152,10 +157,10 @@ async function nickauth(nick: string, bot: Bot) {
 function createApi(nick: string, to: string, text: string, bot: Bot, op: Rank, user?: string): CmdApi {
   let responseLocation = bot.client.client.nick === to ? nick : to;
   return {
-    respond(text, pm, silent) {
+    respond(text, opts) {
       let message = text;
-      if (!JSON.parse(noPingStore.get('pings') || '[]').includes(nick) && to !== bot.client.client.nick) if (!silent) message = `${nick}: ${message}`;
-      bot.client.client.say(pm || false ? nick : responseLocation, message);
+      if (!JSON.parse(noPingStore.get('pings') || '[]').includes(nick) && to !== bot.client.client.nick) if (!opts?.silent) message = `${nick}: ${message}`;
+      bot.client.client.say(opts?.pm || false ? nick : responseLocation, message);
     },
     runner: nick,
     args: text.startsWith(config.bot.prefix) ? text.substring(config.bot.prefix.length).split(' ').slice(1) : to === bot.client.client.nick ? text.split(' ').slice(1) : [],
@@ -198,7 +203,9 @@ export async function handle(nick: string, to: string, text: string, bot: Bot, o
   }
 
   if (text === '!rollcall') {
-    cmd.respond(bundle['rollcall.response'](config.branding.name, config.branding.owner), false, true);
+    cmd.respond(bundle['rollcall.response'](config.branding.name, config.branding.owner), {
+      silent: true,
+    });
     return;
   }
 
