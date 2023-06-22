@@ -4,6 +4,24 @@ import { defineCommand, defineModule, Module, CommandErrorId } from './modules';
 import { noPingStore } from '..';
 import { Extension } from '../util/ext';
 
+const hyperbole: Record<string, string> = {
+  say: 'communicate',
+  ban: 'banish',
+  talk: 'communicate',
+  kill: 'exterminate',
+  end: 'terminate',
+  see: 'observe',
+  get: 'acquire',
+  big: 'enormous',
+  heavy: 'massive',
+  light: 'weightless',
+  small: 'quantum',
+  ball: 'spherical object',
+  learn: 'acquire information pertaining to',
+  want: 'wish',
+  use: 'leverage',
+};
+
 export const utility: Module = defineModule('utility', {
   sh: defineCommand(
     'sh',
@@ -55,7 +73,7 @@ export const utility: Module = defineModule('utility', {
   }),
   runext: defineCommand(
     'runext',
-    'runext <source>',
+    '<source>',
     'runs an extension from its source',
     (cmd) => {
       if (!cmd.arg) throw CommandErrorId.NotEnoughArguments;
@@ -64,4 +82,12 @@ export const utility: Module = defineModule('utility', {
     },
     (cmd) => cmd.op === Rank.Owner
   ),
+  hyperbole: defineCommand('hyperbole', '<sentence>', 'replaces every word in a sentence with an exaggerated version', (cmd) => {
+    cmd.respond(
+      cmd.arg
+        .split(' ')
+        .map((v) => hyperbole[v] || v)
+        .join(' ')
+    );
+  }),
 });
