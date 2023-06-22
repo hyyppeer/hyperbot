@@ -31,7 +31,7 @@ interface IrcOptions {
   userName?: string;
   realName?: string;
   port?: number;
-  localAddress?: unknown;
+  localAddress?: string;
   debug?: boolean;
   showErrors?: boolean;
   autoRejoin?: boolean;
@@ -90,7 +90,7 @@ interface Chans {
     key: string;
     serverName: string;
     users: Nicks;
-    modeParams: unknown; //is object, tbd
+    modeParams: Record<any, any>; // tbd
     topic: string;
     mode: string;
     topicBy: string;
@@ -116,7 +116,7 @@ interface IrcClientFunctions {
   nick: string;
   chans: Chans;
   conn: Socket;
-  _whoisData(): unknown;
+  _whoisData: Record<any, any>;
   _addWhoisData(data: WhoisInfo): void;
   _clearWhoisData(): void;
 }
