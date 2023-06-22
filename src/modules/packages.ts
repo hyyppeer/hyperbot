@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from 'fs';
+import { writeFileSync } from 'fs';
 import { JsonCmdAction, JsonCmdActionType, JsonCmdListener, JsonCommand, JsonCommands, JsonPackage } from '../util/jsoncmds';
 import { Rank } from '../bot/bot';
 import { CommandErrorId, Module, defineCommand, defineModule } from './modules';
@@ -9,26 +9,6 @@ import { randomBytes } from 'crypto';
 import { HyperPackageManager } from '../util/hpm';
 
 export const packages: Module = defineModule('packages', [
-  defineCommand(
-    'loadpkg',
-    '<pkg-name>',
-    'load a package from json-pkgs',
-    (cmd) => {
-      if (!cmd.args[0]) throw CommandErrorId.NotEnoughArguments;
-      JsonCommands.loadPackage(readFileSync(`${config.jsonpkg.rootdir}/${cmd.args[0]}`).toString('utf8'));
-    },
-    (cmd) => cmd.op >= Rank.Owner
-  ),
-  defineCommand(
-    'unloadpkg',
-    '<pkg-name>',
-    'unload a package from json-pkgs',
-    (cmd) => {
-      if (!cmd.args[0]) throw CommandErrorId.NotEnoughArguments;
-      JsonCommands.unloadPackage(readFileSync(`${config.jsonpkg.rootdir}/${cmd.args[0]}`).toString('utf8'));
-    },
-    (cmd) => cmd.op >= Rank.Owner
-  ),
   defineCommand(
     'createpkg',
     '',
