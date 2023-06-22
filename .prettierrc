@@ -1,4 +1,5 @@
 {
   "printWidth": 400,
-  "singleQuote": true
+  "singleQuote": true,
+  "singleAttributePerLine": true
 }
