@@ -7,6 +7,11 @@ let duck = false;
 function addDuck(bot: Bot) {
   bot.client.client.say(config.ducks.channel, 'QUACK!! (-bef to befriend)');
   duck = true;
+  setTimeout(() => {
+    if (!duck) return;
+    bot.client.client.say(config.ducks.channel, 'quack :( the duck has left!');
+    duck = false;
+  }, 5 * 60 * 1000);
 }
 
 export const ducks: Module = defineModule(
