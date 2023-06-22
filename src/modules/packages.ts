@@ -6,6 +6,7 @@ import { Logger } from '../util/logger';
 import { config } from '..';
 import { Shell } from '../bot/services/town/shell';
 import { randomBytes } from 'crypto';
+import { HyperPackageManager } from '../util/hpm';
 
 export const packages: Module = defineModule('packages', {
   loadpkg: defineCommand(
@@ -109,6 +110,7 @@ export const packages: Module = defineModule('packages', {
       cmd.respond(`Your package has been stored in /home/hyper/hyperbot/pkgs/${pkgid}`);
       cmd.respond('Load it using the loadpkgstr command');
       const submit = await cmd.confirm('Would you like to submit this package to be reviewed and potentially added to the bot?');
+      const hpmSubmit = await cmd.confirm('Would you like to submit this package to HPM (hyper package manager)');
 
       if (submit) {
         writeFileSync(`${config.jsonpkg.submissionrootdir}/submit-${pkgid}.pkg`, pkgstr);
@@ -116,6 +118,14 @@ export const packages: Module = defineModule('packages', {
         cmd.respond('Submitted!');
         Logger.info('package', `Submitted package ${pkgid} for review in ${config.jsonpkg.submissionrootdir}`);
       } else cmd.respond('Your package has not been submitted');
+      if (hpmSubmit) {
+        const user = await cmd.identify();
+        const name = await cmd.ask('Please enter a name for your HPM package', () => {
+          throw 'Your package has not been submitted to HPM';
+        });
+        HyperPackageManager.add(`~${user}/${name}`, pkgstr);
+        cmd.respond('Submitted to HPM!');
+      } else cmd.respond('Your package has not been submitted to HPM');
     },
     (cmd) => cmd.op >= Rank.Admin
   ),
@@ -135,4 +145,32 @@ export const packages: Module = defineModule('packages', {
 
     JsonCommands.unloadPackage(cmd.arg);
   }),
+  'hpm-load': defineCommand(
+    'hpm-load',
+    '<package-path>',
+    'loads a package from hyper package manager',
+    (cmd) => {
+      if (!cmd.arg) throw 'No path provided!';
+      const pkg = HyperPackageManager.get(cmd.arg);
+      if (!pkg) throw "Sorry, that package doesn't exist";
+
+      JsonCommands.loadPackage(pkg);
+      cmd.respond('Success!');
+    },
+    (cmd) => cmd.op >= Rank.Owner
+  ),
+  'hpm-unload': defineCommand(
+    'hpm-unload',
+    '<package-path>',
+    'unloads a package from hyper package manager',
+    (cmd) => {
+      if (!cmd.arg) throw 'No path provided!';
+      const pkg = HyperPackageManager.get(cmd.arg);
+      if (!pkg) throw "Sorry, that package doesn't exist";
+
+      JsonCommands.unloadPackage(pkg);
+      cmd.respond('Success!');
+    },
+    (cmd) => cmd.op >= Rank.Owner
+  ),
 });

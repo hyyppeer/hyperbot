@@ -13,6 +13,7 @@ export const noPingStore = new Store('noping');
 export const lastSeenStore = new Store('lastseen');
 export const reminderStore = new Store('reminders');
 export const duckStore = new Store('duck');
+export const hpmStore = new Store('hpm');
 
 async function start() {
   Logger.level = LogLevel.Debug;
