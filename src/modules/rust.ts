@@ -3,8 +3,8 @@ import { Logger } from '../util/logger';
 import { replaceAll } from '../util/polyfills';
 import { CommandErrorId, Module, defineCommand, defineModule } from './modules';
 
-export const rust: Module = defineModule('rust', {
-  rustexec: defineCommand('rustexec', '<channel (stable/beta/nightly)> <mode (debug/release)> <code>', 'executes a rust program using play.rust-lang.org/execute', (cmd) => {
+export const rust: Module = defineModule('rust', [
+  defineCommand('rustexec', '<channel (stable/beta/nightly)> <mode (debug/release)> <code>', 'executes a rust program using play.rust-lang.org/execute', (cmd) => {
     if (cmd.args.length < 3) throw CommandErrorId.NotEnoughArguments;
     const params = {
       backtrace: false,
@@ -50,4 +50,4 @@ export const rust: Module = defineModule('rust', {
         Logger.error('rust', reason);
       });
   }),
-});
+]);

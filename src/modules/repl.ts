@@ -3,8 +3,8 @@ import { Rank } from '../bot/bot';
 import { Shell } from '../bot/services/town/shell';
 import { CommandErrorId, Module, defineCommand, defineModule } from './modules';
 
-export const repl: Module = defineModule('repl', {
-  'start-repl': defineCommand(
+export const repl: Module = defineModule('repl', [
+  defineCommand(
     'start-repl',
     '<js/sh/ext>',
     'start a repl (js or shell or extension)',
@@ -43,4 +43,4 @@ export const repl: Module = defineModule('repl', {
     },
     (cmd) => cmd.op >= Rank.Owner
   ),
-});
+]);

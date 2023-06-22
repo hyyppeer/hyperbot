@@ -39,7 +39,7 @@ export interface CmdApi {
   identify(): Promise<string>;
 }
 
-interface Command {
+export interface Command {
   name: string;
   run: (cmd: CmdApi) => void;
   authenticate: (cmd: CmdApi) => boolean;
@@ -57,10 +57,16 @@ export interface Module {
   register?: (bot: Bot) => void;
 }
 
-export function defineModule(name: string, contents: ModuleContents, register?: (bot: Bot) => void): Module {
+export function defineModule(name: string, contents: Command[], register?: (bot: Bot) => void): Module {
+  const contobj: ModuleContents = {};
+
+  contents.forEach((content) => {
+    contobj[content.name] = content;
+  });
+
   return {
     name,
-    contents,
+    contents: contobj,
     register,
   };
 }

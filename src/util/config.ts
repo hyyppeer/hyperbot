@@ -1,5 +1,4 @@
 import { readFileSync } from 'fs';
-import { Logger } from './logger';
 import { replaceAll } from './polyfills';
 
 export interface Config {

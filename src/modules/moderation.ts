@@ -1,8 +1,8 @@
 import { Rank } from '../bot/bot';
 import { CommandErrorId, defineCommand, defineModule, Module } from './modules';
 
-export const moderation: Module = defineModule('moderation', {
-  op: defineCommand(
+export const moderation: Module = defineModule('moderation', [
+  defineCommand(
     'op',
     '<nick> <rank>',
     'ops a nick for the duration of their session',
@@ -16,7 +16,7 @@ export const moderation: Module = defineModule('moderation', {
     },
     (cmd) => cmd.op === Rank.Owner
   ),
-  deop: defineCommand(
+  defineCommand(
     'deop',
     '<nick>',
     'deops a nick',
@@ -27,7 +27,7 @@ export const moderation: Module = defineModule('moderation', {
     },
     (cmd) => cmd.op === Rank.Owner
   ),
-  chanop: defineCommand('chanop', '<nick> <rank> [<channel>]', 'chanops a nick in a specific channel (current by default) for the duration of their session', (cmd) => {
+  defineCommand('chanop', '<nick> <rank> [<channel>]', 'chanops a nick in a specific channel (current by default) for the duration of their session', (cmd) => {
     if (cmd.args.length < 2) throw CommandErrorId.NotEnoughArguments;
     if (Number.isNaN(Number.parseInt(cmd.args[1]))) {
       throw CommandErrorId.InvalidArguments;
@@ -36,10 +36,10 @@ export const moderation: Module = defineModule('moderation', {
     cmd.bot.chanop(cmd.args[0], Number.parseInt(cmd.args[1]), cmd.args[2] || cmd.channel);
     cmd.respond("Successfully chanop'ed user");
   }),
-  dechanop: defineCommand('dechanop', '<nick> [<channel>]', 'dechanops a nick in a specific channel (current by default) for the duration of their session', (cmd) => {
+  defineCommand('dechanop', '<nick> [<channel>]', 'dechanops a nick in a specific channel (current by default) for the duration of their session', (cmd) => {
     if (cmd.args.length < 1) throw CommandErrorId.NotEnoughArguments;
 
     cmd.bot.dechanop(cmd.args[0], cmd.args[1] || cmd.channel);
     cmd.respond("Successfully dechanop'ed user");
   }),
-});
+]);

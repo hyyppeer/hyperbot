@@ -9,7 +9,7 @@ export class Client {
   client: IrcClient;
   private questionCallbackTable: Record<string, (answer: string) => void> = {};
   private learntQuestioning: string[] = [];
-  constructor(server: string, port: number, nickname: string, secure: boolean, channels: string[], username?: string, realname?: string) {
+  constructor(private server: string, private port: number, private nickname: string, secure: boolean, channels: string[], username?: string, realname?: string) {
     Logger.info('client', `connecting to ${chalk.redBright(`${server}:${port}`)} as ${chalk.greenBright(nickname)} (secure? ${secure ? chalk.greenBright('yes') : chalk.redBright('no')}) in ${channels.join(' ')}`);
     this.client = new irc.Client(server, nickname, {
       channels,
@@ -21,7 +21,7 @@ export class Client {
       floodProtection: true,
     });
 
-    this.startLogging(server, port, nickname);
+    this.startLogging();
 
     this.client.on('message', (nick, to, text) => {
       if (!(this.questionCallbackTable[nick] && text.toLowerCase().startsWith('a> '))) return;
@@ -30,13 +30,13 @@ export class Client {
     });
   }
 
-  private startLogging(server: string, port: number, nickname: string) {
+  private startLogging() {
     this.client.on('message', (nick, to, text) => {
       const locator = chalk.grey(`${to} <- ${nick}`.padEnd(19, ' '));
       Logger.verbose('chat', `${locator}: ${text}`);
     });
     this.client.on('selfMessage', (to, text) => {
-      const locator = chalk.grey(`${nickname} -> ${to}`.padEnd(19, ' '));
+      const locator = chalk.grey(`${this.nickname} -> ${to}`.padEnd(19, ' '));
       Logger.verbose('chat', `${locator}: ${text}`);
     });
     this.client.on('action', (from, to, text) => {
@@ -50,7 +50,7 @@ export class Client {
       Logger.verbose('chat', `${chan}: ${by} sets -${mode} on ${arg}`);
     });
     this.client.on('notice', (nick, to, text) => {
-      Logger.verbose('chat', `${nick || `${server}:${port}`} -> ${to}: [NOTICE] ${text}`);
+      Logger.verbose('chat', `-> ${to}: -${nick || `${this.server}:${this.port}`}- ${text}`);
     });
     this.client.on('ctcp-version', (from, to) => {
       Logger.verbose('chat', `${from} -> ${to}: [VERSION]`);

@@ -22,8 +22,8 @@ const hyperbole: Record<string, string> = {
   use: 'leverage',
 };
 
-export const utility: Module = defineModule('utility', {
-  sh: defineCommand(
+export const utility: Module = defineModule('utility', [
+  defineCommand(
     'sh',
     '<command>',
     'run a shell command',
@@ -34,7 +34,7 @@ export const utility: Module = defineModule('utility', {
     },
     (cmd) => cmd.op === Rank.Owner
   ),
-  eval: defineCommand(
+  defineCommand(
     'eval',
     '<javascript>',
     'evaluate javascript code',
@@ -43,7 +43,7 @@ export const utility: Module = defineModule('utility', {
     },
     (cmd) => cmd.op === Rank.Owner
   ),
-  noping: defineCommand('noping', '[<true/false/yes/y/no/n/t/f>]', 'toggles/sets whether or not to ping you when responding', (cmd) => {
+  defineCommand('noping', '[<true/false/yes/y/no/n/t/f>]', 'toggles/sets whether or not to ping you when responding', (cmd) => {
     const list: Array<string> = JSON.parse(noPingStore.get('pings') || '[]');
     const pinged = !list.includes(cmd.runner);
 
@@ -68,10 +68,10 @@ export const utility: Module = defineModule('utility', {
     noPingStore.set('pings', JSON.stringify(list));
     cmd.respond('success');
   }),
-  uptime: defineCommand('uptime', '', 'shows how much the bot has been running', (cmd) => {
+  defineCommand('uptime', '', 'shows how much the bot has been running', (cmd) => {
     cmd.respond(`${Math.floor(process.uptime())}s`);
   }),
-  runext: defineCommand(
+  defineCommand(
     'runext',
     '<source>',
     'runs an extension from its source',
@@ -82,7 +82,7 @@ export const utility: Module = defineModule('utility', {
     },
     (cmd) => cmd.op === Rank.Owner
   ),
-  hyperbole: defineCommand('hyperbole', '<sentence>', 'replaces every word in a sentence with an exaggerated version', (cmd) => {
+  defineCommand('hyperbole', '<sentence>', 'replaces every word in a sentence with an exaggerated version', (cmd) => {
     cmd.respond(
       cmd.arg
         .split(' ')
@@ -90,4 +90,4 @@ export const utility: Module = defineModule('utility', {
         .join(' ')
     );
   }),
-});
+]);

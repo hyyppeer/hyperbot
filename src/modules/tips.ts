@@ -11,7 +11,7 @@ function getRandomTip(): string {
   return `Tip #${id}: ${tipsarr[id]}`;
 }
 
-export const tips: Module = defineModule('tips', {}, (bot) =>
+export const tips: Module = defineModule('tips', [], (bot) =>
   bot.client.client.on('join', (channel, nick) => {
     if (nick !== bot.client.client.nick) return;
 

@@ -1,8 +1,8 @@
 import { defineCommand, defineModule, Module } from './modules';
 import axios from 'axios';
 
-export const fun: Module = defineModule('fun', {
-  dadjoke: defineCommand('dadjoke', '', 'get a random dad joke from icanhazdadjoke.com', (cmd) => {
+export const fun: Module = defineModule('fun', [
+  defineCommand('dadjoke', '', 'get a random dad joke from icanhazdadjoke.com', (cmd) => {
     axios
       .get('https://icanhazdadjoke.com/', {
         headers: {
@@ -13,7 +13,7 @@ export const fun: Module = defineModule('fun', {
         cmd.respond(response.data);
       });
   }),
-  '8ball': defineCommand('8ball', '', 'ask an 8ball a question', (cmd) => {
+  defineCommand('8ball', '', 'ask an 8ball a question', (cmd) => {
     const responses: string[] = [
       'It is certain.',
       'It is decidedly so.',
@@ -39,11 +39,11 @@ export const fun: Module = defineModule('fun', {
 
     cmd.respond(responses[Math.floor(Math.random() * responses.length)]);
   }),
-  dice: defineCommand('dice', '', 'roll a dice (1-6)', (cmd) => {
+  defineCommand('dice', '', 'roll a dice (1-6)', (cmd) => {
     const responses = '⚀⚁⚂⚃⚄⚅'.split('');
 
     const num = Math.floor(Math.random() * responses.length);
 
     cmd.respond(`${responses[num]} You rolled a ${num + 1}!`);
   }),
-});
+]);

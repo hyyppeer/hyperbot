@@ -19,8 +19,8 @@ function addDuck(bot: Bot) {
 
 export const ducks: Module = defineModule(
   'ducks',
-  {
-    bef: defineCommand('bef', '', 'befriend the current duck in the channel (if there is one)', async (cmd) => {
+  [
+    defineCommand('bef', '', 'befriend the current duck in the channel (if there is one)', async (cmd) => {
       await cmd.identify();
       if (!cmd.user) throw CommandErrorId.InternalFailure;
 
@@ -38,7 +38,7 @@ export const ducks: Module = defineModule(
         cmd.respond(`You befriended the duck, you have befriended ${ducks + 1} in ${config.ducks.channel}!`);
       } else throw 'There is no duck!';
     }),
-    ducks: defineCommand('ducks', '', 'tells you how many ducks you have', async (cmd) => {
+    defineCommand('ducks', '', 'tells you how many ducks you have', async (cmd) => {
       await cmd.identify();
       if (!cmd.user) throw CommandErrorId.InternalFailure;
 
@@ -50,7 +50,7 @@ export const ducks: Module = defineModule(
       const ducks = Number.parseInt(val);
       cmd.respond(`You have ${ducks} ducks in ${config.ducks.channel}!`);
     }),
-    // add: defineCommand(
+    // defineCommand(
     //   'add',
     //   '',
     //   'add a duck for testing',
@@ -59,7 +59,7 @@ export const ducks: Module = defineModule(
     //   },
     //   (cmd) => cmd.op >= Rank.Owner
     // ),
-  },
+  ],
   (bot) => {
     setInterval(() => addDuck(bot), 15 * 60 * 1000);
   }

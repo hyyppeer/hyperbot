@@ -1,9 +1,8 @@
 import { Bot } from '../bot';
 
 export class Cli {
-  bot: Bot;
   prefix: string = '\\';
-  constructor(bot: Bot) {
+  constructor(private bot: Bot) {
     this.bot = bot;
 
     process.stdin.on('data', (data) => {

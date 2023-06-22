@@ -1,5 +1,5 @@
 import { Rank } from '../bot/bot';
-import { CmdApi, commands, defineCommand, defineModule, ModuleContents, modules } from '../modules/modules';
+import { CmdApi, Command, commands, defineCommand, defineModule, ModuleContents, modules } from '../modules/modules';
 import { Logger } from './logger';
 
 export type JsonCmdActionType = 'say' | 'do';
@@ -96,12 +96,12 @@ export class JsonCommands {
 
   static loadPackage(pkgstr: string) {
     const pkg: JsonPackage = JSON.parse(this.decompress(pkgstr));
-    let contents: ModuleContents = {};
+    let contents: Command[] = [];
 
     pkg.commands.forEach((command) => {
       const ranListeners: JsonCmdListener[] = command.listeners.filter((listener) => listener.on === 'ran');
 
-      contents[command.name] = defineCommand(
+      const cmd = defineCommand(
         command.name,
         command.syntax,
         command.help,
@@ -123,9 +123,10 @@ export class JsonCommands {
         },
         (cmd) => cmd.op >= (command.rankRequired || Rank.User)
       );
-      commands[command.name] = contents[command.name];
-    });
 
+      contents.push(cmd);
+      commands[cmd.name] = cmd;
+    });
     modules[pkg.name] = defineModule(pkg.name, contents);
   }
 

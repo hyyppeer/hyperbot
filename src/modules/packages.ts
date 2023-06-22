@@ -8,8 +8,8 @@ import { Shell } from '../bot/services/town/shell';
 import { randomBytes } from 'crypto';
 import { HyperPackageManager } from '../util/hpm';
 
-export const packages: Module = defineModule('packages', {
-  loadpkg: defineCommand(
+export const packages: Module = defineModule('packages', [
+  defineCommand(
     'loadpkg',
     '<pkg-name>',
     'load a package from json-pkgs',
@@ -19,7 +19,7 @@ export const packages: Module = defineModule('packages', {
     },
     (cmd) => cmd.op >= Rank.Owner
   ),
-  unloadpkg: defineCommand(
+  defineCommand(
     'unloadpkg',
     '<pkg-name>',
     'unload a package from json-pkgs',
@@ -29,7 +29,7 @@ export const packages: Module = defineModule('packages', {
     },
     (cmd) => cmd.op >= Rank.Owner
   ),
-  createpkg: defineCommand(
+  defineCommand(
     'createpkg',
     '',
     'create a package, you will be asked to enter info about it',
@@ -129,7 +129,7 @@ export const packages: Module = defineModule('packages', {
     },
     (cmd) => cmd.op >= Rank.Admin
   ),
-  loadpkgstr: defineCommand(
+  defineCommand(
     'loadpkgstr',
     '<pkgstr>',
     'loads a package from its pkgstr',
@@ -140,12 +140,12 @@ export const packages: Module = defineModule('packages', {
     },
     (cmd) => cmd.op >= Rank.Owner
   ),
-  unloadpkgstr: defineCommand('unloadpkgstr', '<pkgstr>', 'unloads a package from its package string', (cmd) => {
+  defineCommand('unloadpkgstr', '<pkgstr>', 'unloads a package from its package string', (cmd) => {
     if (!cmd.arg) throw CommandErrorId.NotEnoughArguments;
 
     JsonCommands.unloadPackage(cmd.arg);
   }),
-  'hpm-load': defineCommand(
+  defineCommand(
     'hpm-load',
     '<package-path>',
     'loads a package from hyper package manager',
@@ -159,7 +159,7 @@ export const packages: Module = defineModule('packages', {
     },
     (cmd) => cmd.op >= Rank.Owner
   ),
-  'hpm-unload': defineCommand(
+  defineCommand(
     'hpm-unload',
     '<package-path>',
     'unloads a package from hyper package manager',
@@ -173,4 +173,4 @@ export const packages: Module = defineModule('packages', {
     },
     (cmd) => cmd.op >= Rank.Owner
   ),
-});
+]);
