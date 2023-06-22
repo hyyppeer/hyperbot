@@ -1,18 +1,8 @@
 import { Client } from './client/client';
 import { Config, Bundle } from '../util/config';
 import { Logger } from '../util/logger';
-import { fun } from '../modules/fun';
-import { moderation } from '../modules/moderation';
-import { handle, init } from '../modules/modules';
-import { utility } from '../modules/utility';
-import { social } from '../modules/social';
+import { Module, handle, init } from '../modules/modules';
 import { LastSeen } from './services/lastseen';
-import { packages } from '../modules/packages';
-import { reminders } from '../modules/reminders';
-import { repl } from '../modules/repl';
-import { help } from '../modules/help';
-import { rust } from '../modules/rust';
-import { ducks } from '../modules/ducks';
 
 export enum Rank {
   User = 0,
@@ -33,9 +23,9 @@ export class Bot {
       [name: string]: Rank;
     };
   } = {};
-  constructor(config: Config, bundle: Bundle) {
+  constructor(config: Config, modules: Module[]) {
     this.client = new Client(config.conn.server, config.conn.port, config.branding.name, config.conn.secure, config.bot.channels, config.branding.username, config.branding.realname);
-    init([utility, moderation, fun, social, packages, reminders, repl, help, rust, ducks /*, tips*/], this);
+    init(modules, this);
 
     this.client.client.on('message', async (nick, to, text) => {
       await handle(nick, to, text, this, this.oprank(nick, to), this.users[nick]);
@@ -48,7 +38,7 @@ export class Bot {
     this.client.client.on('join', (channel, nick) => {
       LastSeen.seen(nick);
       if (nick === this.client.client.nick) {
-        this.client.client.say(channel, bundle['text.onjoin'](config.branding.name, config.branding.owner));
+        this.client.client.say(channel, config.messages.join(config.branding.name, config.branding.owner));
         setTimeout(() => this.scanchan(channel), 5000);
       }
     });

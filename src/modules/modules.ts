@@ -1,6 +1,6 @@
 import { types } from 'util';
 import { Bot, Rank } from '../bot/bot';
-import { bundle, config, noPingStore } from '../index';
+import { config, noPingStore } from '../index';
 import { Logger } from '../util/logger';
 import chalk from 'chalk';
 
@@ -209,7 +209,7 @@ export async function handle(nick: string, to: string, text: string, bot: Bot, o
   }
 
   if (text === '!rollcall') {
-    cmd.respond(bundle['rollcall.response'](config.branding.name, config.branding.owner), {
+    cmd.respond(config.messages.rollcall(config.branding.name, config.branding.owner), {
       silent: true,
     });
     return;
