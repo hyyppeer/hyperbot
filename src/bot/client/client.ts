@@ -10,6 +10,7 @@ export class Client {
   client: IrcClient;
   private questionCallbackTable: Record<string, (answer: string) => void> = {};
   private learntQuestioning: string[] = [];
+  private whoisCache: Record<string, WhoisInfo> = {};
   constructor(public server: string, public port: number, public nickname: string, secure: boolean, channels: string[], username?: string, realname?: string) {
     Logger.info('client', `connecting to ${chalk.redBright(`${server}:${port}`)} as ${chalk.greenBright(nickname)} (secure? ${secure ? chalk.greenBright('yes') : chalk.redBright('no')}) in ${channels.join(' ')}`);
     this.client = new irc.Client(server, nickname, {
@@ -29,11 +30,21 @@ export class Client {
       this.questionCallbackTable[nick](text.substring(3));
       this.learntQuestioning.includes(nick) ? undefined : this.learntQuestioning.push(nick);
     });
+    this.client.on('quit', (nick) => {
+      delete this.whoisCache[nick];
+    });
   }
 
   async whois(nick: string): Promise<WhoisInfo> {
     return new Promise((resolve) => {
-      this.client.whois(nick, resolve);
+      if (this.whoisCache[nick]) {
+        resolve(this.whoisCache[nick]);
+        return;
+      }
+      this.client.whois(nick, (info) => {
+        this.whoisCache[nick] = info;
+        resolve(info);
+      });
     });
   }
 

@@ -53,22 +53,22 @@ export class Bot {
   }
 
   op(nick: string, rank: Rank) {
-    Logger.info('mod', `${nick} is now OP ${rank}`);
+    Logger.info('moderation', `${nick} is now OP ${rank}`);
     this.ops[nick] = rank;
   }
 
   chanop(nick: string, rank: Rank, channel: string) {
-    Logger.info('mod', `${nick} is now OP ${rank} in channel ${channel}`);
+    Logger.info('moderation', `${nick} is now OP ${rank} in channel ${channel}`);
     if (this.chanops[channel]) this.chanops[channel][nick] = rank;
   }
 
   deop(nick: string) {
-    Logger.info('mod', `${nick} is no longer OP`);
+    Logger.info('moderation', `${nick} is no longer OP`);
     if (this.ops[nick]) delete this.ops[nick];
   }
 
   dechanop(nick: string, channel: string) {
-    Logger.info('mod', `${nick} is no longer OP in ${channel}`);
+    Logger.info('moderation', `${nick} is no longer OP in ${channel}`);
     if (this.chanops[channel] && this.chanops[channel][nick]) delete this.chanops[channel][nick];
   }
 

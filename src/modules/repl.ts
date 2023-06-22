@@ -41,6 +41,6 @@ export const repl: Module = defineModule('repl', [
       }
       cmd.respond('Exited repl successfully.');
     },
-    (cmd) => cmd.op >= Rank.Owner
+    Rank.Owner
   ),
 ]);

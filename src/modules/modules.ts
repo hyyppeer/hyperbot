@@ -71,11 +71,11 @@ export function defineModule(name: string, contents: Command[], register?: (bot:
   };
 }
 
-export function defineCommand(name: string, syntax: string, help: ((cmd: CmdApi) => string) | string, handler: (cmd: CmdApi) => void, authenticator?: (cmd: CmdApi) => boolean): Command {
+export function defineCommand(name: string, syntax: string, help: ((cmd: CmdApi) => string) | string, handler: (cmd: CmdApi) => void, authenticator?: ((cmd: CmdApi) => boolean) | Rank): Command {
   return {
     name,
     run: handler,
-    authenticate: authenticator || (() => true),
+    authenticate: authenticator ? (isRank(authenticator) ? (cmd) => cmd.op >= authenticator : authenticator) : () => true,
     syntax,
     help: typeof help === 'string' ? () => help : help,
   };
@@ -96,6 +96,11 @@ function loadModule(mod: Module, bot: Bot) {
 
 function isCmdErr(e: any): e is CmdErr {
   return e.id && e.desc && typeof e.id === 'number' && typeof e.desc === 'string' && e.id >= 0;
+}
+
+function isRank(v: any): v is Rank {
+  const num = Number.parseInt(v);
+  return !Number.isNaN(num) && num >= Rank.User && num <= Rank.Owner;
 }
 
 function handleCallError(e: any, cmd: CmdApi) {
@@ -155,7 +160,7 @@ async function nickauth(nick: string, bot: Bot) {
     const info = await bot.client.whois(nick);
     if (info.user === config.auth.ownernick) {
       ownernick = nick;
-      Logger.info('mod', `Automatically OP'ed ${nick} to owner (ownernick is ${config.auth.ownernick})`);
+      Logger.info('moderation', `Automatically OP'ed ${nick} to owner (ownernick is ${config.auth.ownernick})`);
     }
   }
 }
@@ -172,7 +177,7 @@ function createApi(nick: string, to: string, text: string, bot: Bot, op: Rank, u
     args: text.startsWith(config.bot.prefix) ? text.substring(config.bot.prefix.length).split(' ').slice(1) : to === bot.client.client.nick ? text.split(' ').slice(1) : [],
     arg: text.startsWith(config.bot.prefix) ? text.substring(config.bot.prefix.length).split(' ').slice(1).join(' ') : to === bot.client.client.nick ? text.split(' ').slice(1).join(' ') : '',
     todo() {
-      this.respond('command is todo');
+      this.respond('This command is TODO');
     },
     op,
     bot,

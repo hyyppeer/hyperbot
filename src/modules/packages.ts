@@ -107,7 +107,7 @@ export const packages: Module = defineModule('packages', [
         cmd.respond('Submitted to HPM!');
       } else cmd.respond('Your package has not been submitted to HPM');
     },
-    (cmd) => cmd.op >= Rank.Admin
+    Rank.Admin
   ),
   defineCommand(
     'loadpkgstr',
@@ -117,14 +117,22 @@ export const packages: Module = defineModule('packages', [
       if (!cmd.arg) throw CommandErrorId.NotEnoughArguments;
 
       JsonCommands.loadPackage(cmd.arg);
+      cmd.respond('The package should be now loaded!');
     },
-    (cmd) => cmd.op >= Rank.Owner
+    Rank.Owner
   ),
-  defineCommand('unloadpkgstr', '<pkgstr>', 'unloads a package from its package string', (cmd) => {
-    if (!cmd.arg) throw CommandErrorId.NotEnoughArguments;
+  defineCommand(
+    'unloadpkgstr',
+    '<pkgstr>',
+    'unloads a package from its package string',
+    (cmd) => {
+      if (!cmd.arg) throw CommandErrorId.NotEnoughArguments;
 
-    JsonCommands.unloadPackage(cmd.arg);
-  }),
+      JsonCommands.unloadPackage(cmd.arg);
+      cmd.respond('The package should be now unloaded!');
+    },
+    Rank.Owner
+  ),
   defineCommand(
     'hpm-load',
     '<package-path>',
@@ -137,7 +145,7 @@ export const packages: Module = defineModule('packages', [
       JsonCommands.loadPackage(pkg);
       cmd.respond('Success!');
     },
-    (cmd) => cmd.op >= Rank.Owner
+    Rank.Owner
   ),
   defineCommand(
     'hpm-unload',
@@ -151,6 +159,6 @@ export const packages: Module = defineModule('packages', [
       JsonCommands.unloadPackage(pkg);
       cmd.respond('Success!');
     },
-    (cmd) => cmd.op >= Rank.Owner
+    Rank.Owner
   ),
 ]);

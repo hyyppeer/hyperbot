@@ -32,16 +32,16 @@ export const utility: Module = defineModule('utility', [
       const escaped = out.trim().split('\n').join('\\n');
       cmd.respond(`Code ${code}: ${escaped}`);
     },
-    (cmd) => cmd.op === Rank.Owner
+    Rank.Owner
   ),
   defineCommand(
     'eval',
     '<javascript>',
     'evaluate javascript code',
     (cmd) => {
-      eval(cmd.arg);
+      cmd.respond(`< ${eval(cmd.arg)}`);
     },
-    (cmd) => cmd.op === Rank.Owner
+    Rank.Owner
   ),
   defineCommand('noping', '[<true/false/yes/y/no/n/t/f>]', 'toggles/sets whether or not to ping you when responding', (cmd) => {
     const list: Array<string> = JSON.parse(noPingStore.get('pings') || '[]');
@@ -66,7 +66,7 @@ export const utility: Module = defineModule('utility', [
     }
 
     noPingStore.set('pings', JSON.stringify(list));
-    cmd.respond('success');
+    cmd.respond('Success!');
   }),
   defineCommand('uptime', '', 'shows how much the bot has been running', (cmd) => {
     cmd.respond(`${Math.floor(process.uptime())}s`);
@@ -78,9 +78,9 @@ export const utility: Module = defineModule('utility', [
     (cmd) => {
       if (!cmd.arg) throw CommandErrorId.NotEnoughArguments;
 
-      Extension.execute(cmd.arg, cmd.bot, cmd);
+      cmd.respond(`< ${Extension.execute(cmd.arg, cmd.bot, cmd)}`);
     },
-    (cmd) => cmd.op === Rank.Owner
+    Rank.Owner
   ),
   defineCommand('hyperbole', '<sentence>', 'replaces every word in a sentence with an exaggerated version', (cmd) => {
     cmd.respond(

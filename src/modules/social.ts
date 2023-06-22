@@ -2,7 +2,7 @@ import { lastSeenStore } from '..';
 import { CommandErrorId, defineCommand, defineModule, Module } from './modules';
 
 export const social: Module = defineModule('social', [
-  defineCommand('lastseen', '<nick>', 'tells you the last time i saw <nick>', (cmd) => {
+  defineCommand('lastseen', '<nick>', 'Tells you the last time i saw a nick', (cmd) => {
     if (!cmd.args[0]) throw CommandErrorId.NotEnoughArguments;
 
     const storeval = lastSeenStore.get(cmd.args[0]);

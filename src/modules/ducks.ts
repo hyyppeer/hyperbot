@@ -57,7 +57,7 @@ export const ducks: Module = defineModule(
     //   (cmd) => {
     //     addDuck(cmd.bot);
     //   },
-    //   (cmd) => cmd.op >= Rank.Owner
+    //   Rank.Owner
     // ),
   ],
   (bot) => {
