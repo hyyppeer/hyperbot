@@ -2,6 +2,7 @@ import { Bot } from './bot/bot';
 import { Cli } from './bot/services/cli';
 import { Reminder } from './bot/services/reminders';
 import { Shell } from './bot/services/town/shell';
+import { botany } from './modules/botany';
 import { ducks } from './modules/ducks';
 import { fun } from './modules/fun';
 import { help } from './modules/help';
@@ -28,7 +29,7 @@ async function start() {
   Logger.level = LogLevel.Debug;
 
   await Shell.start();
-  const bot = new Bot(config, [utility, moderation, fun, social, packages, reminders, repl, help, rust, ducks /*, tips*/]);
+  const bot = new Bot(config, [utility, moderation, fun, social, packages, reminders, repl, help, rust, ducks, botany /*, tips*/]);
   const cli = new Cli(bot);
 
   Reminder.init(bot);
