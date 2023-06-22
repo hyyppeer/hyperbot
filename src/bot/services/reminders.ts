@@ -11,8 +11,10 @@ export class Reminder {
   static reminders: ReminderEntry[] = [];
   static init(bot: Bot) {
     this.reminders = JSON.parse(reminderStore.get('reminders') || '[]');
-    this.reminders.forEach((entry) => {
-      this.listen(entry, bot);
+    bot.client.client.on('registered', () => {
+      this.reminders.forEach((entry) => {
+        this.listen(entry, bot);
+      });
     });
   }
 
