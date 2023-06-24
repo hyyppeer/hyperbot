@@ -4,4 +4,4 @@ node_modules/
 tsconfig.tsbuildinfo
 db/*
 jsonpkg-review/
-extensions/*
+extensions/*.js
