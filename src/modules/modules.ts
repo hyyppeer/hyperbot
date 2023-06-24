@@ -3,6 +3,7 @@ import { Bot, Rank } from '../bot/bot';
 import { config, noPingStore } from '../index';
 import { Logger } from '../util/logger';
 import chalk from 'chalk';
+import { Message } from '../bot/client/irc';
 
 export enum CommandErrorId {
   RequiresIdentification,
@@ -37,6 +38,7 @@ export interface CmdApi {
   confirm(confirmation?: string): Promise<boolean>;
   user?: string;
   identify(): Promise<string>;
+  message: Message;
 }
 
 export interface Command {
@@ -155,8 +157,13 @@ function call(cmd: CmdApi, command: string) {
 
 let ownernick = '';
 
-async function nickauth(nick: string, bot: Bot) {
+async function nickauth(nick: string, bot: Bot, message: Message) {
   if (nick === config.auth.ownernick && ownernick !== nick) {
+    if (message.user === config.auth.ownernick) {
+      ownernick = nick;
+      Logger.info('Moderation', `Automatically OP'ed ${nick} to owner via message.user (ownernick is ${config.auth.ownernick})`);
+      return;
+    }
     const info = await bot.client.whois(nick);
     if (info.user === config.auth.ownernick) {
       ownernick = nick;
@@ -165,7 +172,7 @@ async function nickauth(nick: string, bot: Bot) {
   }
 }
 
-function createApi(nick: string, to: string, text: string, bot: Bot, op: Rank, user?: string): CmdApi {
+function createApi(nick: string, to: string, text: string, bot: Bot, op: Rank, message: Message, user?: string): CmdApi {
   let responseLocation = bot.client.client.nick === to ? nick : to;
   return {
     respond(text, opts) {
@@ -191,23 +198,18 @@ function createApi(nick: string, to: string, text: string, bot: Bot, op: Rank, u
     },
     user,
     async identify() {
-      return new Promise((resolve) => {
-        if (!bot.users[nick]) {
-          bot.client.whois(nick).then((info) => {
-            bot.users[nick] = info.user;
-            this.user = info.user;
-            resolve(info.user);
-          });
-        } else resolve(bot.users[nick]);
+      return new Promise(async (resolve) => {
+        resolve(message.user || bot.users[nick] || (await bot.client.whois(nick)).user);
       });
     },
+    message,
   };
 }
 
-export async function handle(nick: string, to: string, text: string, bot: Bot, op: Rank, user?: string) {
-  const cmd: CmdApi = createApi(nick, to, text, bot, op, user);
+export async function handle(nick: string, to: string, text: string, bot: Bot, op: Rank, message: Message, user?: string) {
+  const cmd: CmdApi = createApi(nick, to, text, bot, op, message, user);
 
-  await nickauth(nick, bot);
+  await nickauth(nick, bot, message);
 
   if (nick === ownernick) {
     cmd.op = Rank.Owner;

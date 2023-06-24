@@ -39,6 +39,20 @@ async function start() {
     Logger.error('Process', `Uncaught exception has occurred: ${error.name}: ${error.message} (from ${origin})\n${error.stack}`);
     bot.client.client.say(config.errors.notifications, 'uncaught exception occurred');
   });
+  process.on('SIGPWR', (signal) => {
+    console.log(`adios mi amigo (SIGPWR ${signal})`);
+  });
+  process.on('SIGABRT', (signal) => {
+    console.log(`SIGABRT ${signal}`);
+    bot.client.client.disconnect('SIGABRT on bot process');
+  });
+  process.on('SIGIOT', (signal) => {
+    console.log(`SIGIOT ${signal}`);
+  });
+  process.on('SIGTERM', (signal) => {
+    bot.client.client.disconnect('the user has requested that the bot disconnect');
+    console.log(`SIGTERM ${signal}`);
+  });
 }
 
 start();

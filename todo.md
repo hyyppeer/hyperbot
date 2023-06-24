@@ -1,5 +1,9 @@
 https://github.com/bitbot-irc/bitbot/tree/master/modules is a great source for ideas
 
+[] refactor: client array instead of single client
+[] refactor: each user has a data object instead of the current store system
+[] refactor: depend less on using the raw irc client
+[] refactor: custom client
 [X] option to turn off pinging on response
 [X] must persist
 [X] per channel ops
