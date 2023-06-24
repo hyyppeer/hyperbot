@@ -25,4 +25,24 @@ export const extension: Module = defineModule('extension', [
     },
     Rank.Owner
   ),
+  defineCommand(
+    'eval-load-ext',
+    '<ext-path>',
+    'loads a specified extension from the ext dir and evals it',
+    (cmd) => {
+      Extension.eval(readFileSync(`${config.extensions.root}/${cmd.arg}`, 'utf8'), cmd.bot, cmd);
+    },
+    Rank.Owner
+  ),
+  defineCommand(
+    'eval-ext',
+    '<source>',
+    'evals an extension from its source',
+    (cmd) => {
+      if (!cmd.arg) throw CommandErrorId.NotEnoughArguments;
+
+      cmd.respond(`< ${Extension.eval(cmd.arg, cmd.bot, cmd)}`);
+    },
+    Rank.Owner
+  ),
 ]);
