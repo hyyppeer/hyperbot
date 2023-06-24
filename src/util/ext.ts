@@ -22,7 +22,7 @@ export const util = {
 };
 
 export class Extension {
-  static execute(extsrc: string, bot: Bot, cmd: modules.CmdApi): any {
+  static execute(extsrc: string, bot: Bot, cmd?: modules.CmdApi): any {
     const context = createContext({
       ext: createExtApi(bot),
       $modules: modules,
@@ -33,7 +33,7 @@ export class Extension {
 
     return runInContext(extsrc, context, {});
   }
-  static eval(extsrc: string, bot: Bot, cmd: modules.CmdApi): any {
+  static eval(extsrc: string, bot: Bot, cmd?: modules.CmdApi): any {
     const ext = createExtApi(bot);
     const $modules = modules;
     const $shell = Shell;
