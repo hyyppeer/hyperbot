@@ -15,7 +15,7 @@ function createExtApi(bot: Bot): ExtApi {
   };
 }
 
-const util = {
+export const util = {
   random<T>(array: T[]): T {
     return array[Math.floor(Math.random() * array.length)];
   },

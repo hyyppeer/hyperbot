@@ -82,4 +82,10 @@ export class Bot {
     const users = Object.keys(this.client.client.chans[channel].users);
     LastSeen.seeall(users);
   }
+
+  psa(info: string) {
+    Object.keys(this.client.client.chans).forEach((channel) => {
+      this.client.client.say(channel, `***PSA***: ${info}`);
+    });
+  }
 }

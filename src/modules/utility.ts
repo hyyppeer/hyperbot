@@ -1,8 +1,7 @@
 import { Shell } from '../bot/services/town/shell';
 import { Rank } from '../bot/bot';
-import { defineCommand, defineModule, Module, CommandErrorId } from './modules';
+import { defineCommand, defineModule, Module } from './modules';
 import { noPingStore } from '..';
-import { Extension } from '../util/ext';
 
 const hyperbole: Record<string, string> = {
   say: 'communicate',
@@ -71,17 +70,6 @@ export const utility: Module = defineModule('utility', [
   defineCommand('uptime', '', 'shows how much the bot has been running', (cmd) => {
     cmd.respond(`${Math.floor(process.uptime())}s`);
   }),
-  defineCommand(
-    'runext',
-    '<source>',
-    'runs an extension from its source',
-    (cmd) => {
-      if (!cmd.arg) throw CommandErrorId.NotEnoughArguments;
-
-      cmd.respond(`< ${Extension.execute(cmd.arg, cmd.bot, cmd)}`);
-    },
-    Rank.Owner
-  ),
   defineCommand('hyperbole', '<sentence>', 'replaces every word in a sentence with an exaggerated version', (cmd) => {
     cmd.respond(
       cmd.arg

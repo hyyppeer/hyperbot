@@ -84,7 +84,7 @@ export function defineCommand(name: string, syntax: string, help: ((cmd: CmdApi)
 export const commands: Record<string, Command> = {};
 export const modules: Record<string, Module> = {};
 
-function loadModule(mod: Module, bot: Bot) {
+export function loadModule(mod: Module, bot: Bot) {
   Logger.debug('Modules', `Loading module: ${chalk.greenBright(mod.name)}`);
   modules[mod.name] = mod;
   for (const [key, value] of Object.entries(mod.contents)) {

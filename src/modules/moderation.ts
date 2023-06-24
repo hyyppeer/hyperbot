@@ -56,4 +56,13 @@ export const moderation: Module = defineModule('moderation', [
     },
     Rank.Owner
   ),
+  defineCommand(
+    'psa',
+    '<announcement>',
+    'sends a message to all channels the bot is in',
+    (cmd) => {
+      cmd.bot.psa(cmd.arg);
+    },
+    Rank.Owner
+  ),
 ]);
