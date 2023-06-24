@@ -6,8 +6,10 @@
   "type": "commonjs",
   "scripts": {
     "start": "npm run compile && npm run run",
+    "start:debug": "npm run compile && npm run run:debug",
     "compile": "tsc",
-    "run": "node dist/index.js"
+    "run": "node dist/index.js",
+    "run:debug": "node --inspect dist/index.js"
   },
   "author": "hyper",
   "license": "ISC",
