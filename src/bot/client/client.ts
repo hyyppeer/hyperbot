@@ -12,7 +12,7 @@ export class Client {
   private learntQuestioning: string[] = [];
   private whoisCache: Record<string, WhoisInfo> = {};
   constructor(public server: string, public port: number, public nickname: string, secure: boolean, channels: string[], username?: string, realname?: string) {
-    Logger.info('client', `connecting to ${chalk.redBright(`${server}:${port}`)} as ${chalk.greenBright(nickname)} (secure? ${secure ? chalk.greenBright('yes') : chalk.redBright('no')}) in ${channels.join(' ')}`);
+    Logger.info('client', `Connecting to ${chalk.redBright(`${server}:${port}`)} as ${chalk.greenBright(nickname)} (secure? ${secure ? chalk.greenBright('yes') : chalk.redBright('no')}) in ${channels.join(' ')}`);
     this.client = new irc.Client(server, nickname, {
       channels,
       port,
@@ -38,6 +38,7 @@ export class Client {
   async whois(nick: string): Promise<WhoisInfo> {
     return new Promise((resolve) => {
       if (this.whoisCache[nick]) {
+        Logger.debug('client', `Whois for ${nick} is cached`);
         resolve(this.whoisCache[nick]);
         return;
       }

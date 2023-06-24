@@ -38,7 +38,6 @@ https://github.com/bitbot-irc/bitbot/tree/master/modules is a great source for i
 [] op may choose to greet users to the channel (https://github.com/bitbot-irc/bitbot/blob/master/modules/greeting.py)
 [] python eval
 [] some kind of integration with ~chat
-[] fix web
 
 <jmjl> hyper: you could even set file permissions so a user can create their own submission in the folder
 <jmjl> (or you could make a setuid executable that would save a copy of their submission, with a random id the same way you generate it)

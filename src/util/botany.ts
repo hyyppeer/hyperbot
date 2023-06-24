@@ -22,8 +22,8 @@ interface PlantData {
 export class Botany {
   private visitorsPath: string;
   private dataPath: string;
-  private visitors?: Visitor[];
-  private data?: PlantData;
+  visitors?: Visitor[];
+  data?: PlantData;
   constructor(user: string) {
     this.visitorsPath = `~${user}/.botany/visitors.json`;
     this.dataPath = `~${user}/.botany/${user}_plant_data.json`;
