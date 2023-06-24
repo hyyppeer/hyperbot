@@ -47,7 +47,7 @@ export const rust: Module = defineModule('rust', [
           );
       })
       .catch((reason) => {
-        Logger.error('rust', reason);
+        Logger.error('Rust', reason);
       });
   }),
 ]);

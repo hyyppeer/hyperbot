@@ -78,7 +78,7 @@ function parseArgArr(arr: string[], cmd: CmdApi): string {
         if (out) parts.push(out);
       } catch (e) {
         parts.push(value);
-        Logger.error('jsoncmds', `Error evaluating $!: ${e}`);
+        Logger.error('Json cmds', `Error evaluating $!: ${e}`);
       }
     } else {
       parts.push(value);

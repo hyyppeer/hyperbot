@@ -85,7 +85,7 @@ export const commands: Record<string, Command> = {};
 export const modules: Record<string, Module> = {};
 
 function loadModule(mod: Module, bot: Bot) {
-  Logger.debug('modules', `Loading module: ${chalk.greenBright(mod.name)}`);
+  Logger.debug('Modules', `Loading module: ${chalk.greenBright(mod.name)}`);
   modules[mod.name] = mod;
   for (const [key, value] of Object.entries(mod.contents)) {
     commands[key] = value;
@@ -160,7 +160,7 @@ async function nickauth(nick: string, bot: Bot) {
     const info = await bot.client.whois(nick);
     if (info.user === config.auth.ownernick) {
       ownernick = nick;
-      Logger.info('moderation', `Automatically OP'ed ${nick} to owner (ownernick is ${config.auth.ownernick})`);
+      Logger.info('Moderation', `Automatically OP'ed ${nick} to owner (ownernick is ${config.auth.ownernick})`);
     }
   }
 }

@@ -35,7 +35,7 @@ async function start() {
   Reminder.init(bot);
 
   process.on('uncaughtException', (error, origin) => {
-    Logger.error('process', `Uncaught exception has occurred: ${error.name}: ${error.message} (from ${origin})\n${error.stack}`);
+    Logger.error('Process', `Uncaught exception has occurred: ${error.name}: ${error.message} (from ${origin})\n${error.stack}`);
     bot.client.client.say(config.errors.notifications, 'uncaught exception occurred');
   });
 }

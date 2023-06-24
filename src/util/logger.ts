@@ -11,12 +11,23 @@ export enum LogLevel {
 
 export class Logger {
   private static loglvl: LogLevel;
+  private static wrap(starter: string, message: string) {
+    const width = process.stdout.columns - starter.length;
+    const regex = new RegExp(`.{0,${width}}`, 'g');
+    let lines = message.match(regex);
+
+    return lines
+      ?.filter((v) => !!v)
+      .map((value) => `${starter}${value}`)
+      .join('\n');
+  }
   private static log(color: chalk.ChalkFunction, char: string, ctx: string, message: string, lvl: LogLevel) {
     const ts = new Date();
-    const tstext = chalk.grey(`[${ts.getHours().toString().padStart(2, '0')}:${ts.getMinutes().toString().padStart(2, '0')}:${ts.getSeconds().toString().padStart(2, '0')}]`);
-    const logchar = color(`[${char}]`);
-    const ctxt = color(`[${ctx}]: `.padEnd(13, ' '));
-    if (lvl >= this.loglvl) console.log(`${tstext} ${logchar} ${ctxt}${message}`);
+    const tstext = chalk.grey(`${ts.getHours().toString().padStart(2, '0')}:${ts.getMinutes().toString().padStart(2, '0')}`);
+    const logchar = color(`-${char}-`);
+    const ctxt = color(`${ctx} | `.padStart(13, ' '));
+    const starter = `${tstext} ${logchar} ${ctxt}`;
+    if (lvl >= this.loglvl) console.log(this.wrap(starter, message));
   }
 
   static set level(lvl: LogLevel) {

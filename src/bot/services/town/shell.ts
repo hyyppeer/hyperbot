@@ -9,12 +9,12 @@ export class Shell {
   static async start(): Promise<void> {
     if (this.done) return;
     return new Promise((resolve) => {
-      Logger.info('shell', `Connecting to ${config.shell.user}@${config.shell.host} (ssh)`);
+      Logger.info('Shell', `Connecting to ${config.shell.user}@${config.shell.host} (ssh)`);
       this.done = true;
       this.ssh = new Ssh();
       this.ssh
         .on('ready', () => {
-          Logger.info('shell', `Connected to ${config.shell.user}@${config.shell.host} (ssh)`);
+          Logger.info('Shell', `Connected to ${config.shell.user}@${config.shell.host} (ssh)`);
           resolve();
         })
         .connect({
@@ -29,11 +29,11 @@ export class Shell {
     return new Promise((resolve) => {
       this.ssh.exec(cmd, {}, (err, stream) => {
         if (!this.done) {
-          Logger.error('shell', 'Attempted to run shell command before connection');
+          Logger.error('Shell', 'Attempted to run shell command before connection');
           return;
         }
         if (err) {
-          Logger.error('shell', `Error while executing: ${err}`);
+          Logger.error('Shell', `Error while executing: ${err}`);
           return;
         }
         if (input) stream.write(input);
@@ -43,7 +43,7 @@ export class Shell {
             resolve([data, code]);
           })
           .on('data', (dat: string) => (data += dat))
-          .stderr.on('data', (chnk) => Logger.warn('shell', `Remote error while executing: ${chnk}`));
+          .stderr.on('data', (chnk) => Logger.warn('Shell', `Remote error while executing: ${chnk}`));
       });
     });
   }

@@ -96,7 +96,7 @@ export const packages: Module = defineModule('packages', [
         writeFileSync(`${config.jsonpkg.submissionrootdir}/submit-${pkgid}.pkg`, pkgstr);
         writeFileSync(`${config.jsonpkg.submissionrootdir}/submit-${pkgid}.json`, json);
         cmd.respond('Submitted!');
-        Logger.info('package', `Submitted package ${pkgid} for review in ${config.jsonpkg.submissionrootdir}`);
+        Logger.info('Package', `Submitted package ${pkgid} for review in ${config.jsonpkg.submissionrootdir}`);
       } else cmd.respond('Your package has not been submitted');
       if (hpmSubmit) {
         const user = await cmd.identify();
