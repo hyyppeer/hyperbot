@@ -2,8 +2,8 @@ import { config } from '..';
 import { Module, defineModule, defineCommand, commands, CmdApi, modules } from './modules';
 
 const topics: Record<string, string | ((cmd: CmdApi) => string)> = {
-  'getting-started': 'Use help to get a list of commands then help <command> to get info about a specific command, good luck on your journey!',
-  commands: () => {
+  'getting-started': 'Use modules to get a list of modules then help <command> to get info about a specific command, good luck on your journey!',
+  'commands-list': () => {
     const list = Object.keys(commands);
 
     return `Here is a list of all commands: ${list.join(' ')}`;
