@@ -43,18 +43,18 @@ async function start() {
     Logger.warn('Process', `Unhandled rejection (${reason}) at ${promise}`);
   });
   process.on('SIGPWR', (signal) => {
-    console.log(`adios mi amigo (SIGPWR ${signal})`);
+    Logger.fatal('SIGNALS', `adios mi amigo (SIGPWR ${signal})`);
   });
   process.on('SIGABRT', (signal) => {
-    console.log(`SIGABRT ${signal}`);
+    Logger.fatal('SIGNALS', `SIGABRT ${signal}`);
     bot.client.client.disconnect('SIGABRT on bot process');
   });
   process.on('SIGIOT', (signal) => {
-    console.log(`SIGIOT ${signal}`);
+    Logger.fatal('SIGNALS', `SIGIOT ${signal}`);
   });
   process.on('SIGTERM', (signal) => {
     bot.client.client.disconnect('the user has requested that the bot disconnect');
-    console.log(`SIGTERM ${signal}`);
+    Logger.fatal('SIGNALS', `SIGTERM ${signal}`);
   });
 }
 

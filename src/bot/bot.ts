@@ -29,15 +29,14 @@ export class Bot {
 
     this.client.client.on('message', async (nick, to, text, message) => {
       LastSeen.seen(nick, text);
-      await handle(nick, to, text, this, this.oprank(nick, to), message, this.users[nick]);
+      handle(nick, to, text, this, this.oprank(nick, to), message, this.users[nick]);
       if (!this.users[nick]) {
         if (message.user) {
           this.users[nick] = message.user;
-          return;
-        }
-        this.client.whois(nick).then((info) => {
-          this.users[nick] = info.user;
-        });
+        } else
+          this.client.whois(nick).then((info) => {
+            this.users[nick] = info.user;
+          });
       }
     });
     this.client.client.on('join', (channel, nick) => {
