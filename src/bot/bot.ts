@@ -2,7 +2,6 @@ import { Client } from './client/client';
 import { Config } from '../util/config';
 import { Logger } from '../util/logger';
 import { Module, handle, init } from '../modules/modules';
-import { LastSeen } from './services/lastseen';
 
 export enum Rank {
   User = 0,

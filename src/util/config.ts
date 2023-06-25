@@ -1,5 +1,4 @@
 import { readFileSync } from 'fs';
-import { replaceAll } from './polyfills';
 
 export interface Config {
   [namespace: string]: Record<string, any>;

@@ -1,5 +1,5 @@
 import { config, duckStore } from '..';
-import { Bot, Rank } from '../bot/bot';
+import { Bot } from '../bot/bot';
 import { CommandErrorId, Module, defineCommand, defineModule } from './modules';
 
 let duck = false;
