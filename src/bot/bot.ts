@@ -27,8 +27,7 @@ export class Bot {
     this.client = new Client(config.conn.server, config.conn.port, config.branding.name, config.conn.secure, config.bot.channels, config.branding.username, config.branding.realname);
     init(modules, this);
 
-    this.client.client.on('message', async (nick, to, text, message) => {
-      LastSeen.seen(nick, text);
+    this.client.client.on('message', (nick, to, text, message) => {
       handle(nick, to, text, this, this.oprank(nick, to), message, this.users[nick]);
       if (!this.users[nick]) {
         if (message.user) {
