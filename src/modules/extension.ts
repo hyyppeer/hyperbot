@@ -3,6 +3,7 @@ import { Rank } from '../bot/bot';
 import { Extension } from '../util/ext';
 import { CommandErrorId, Module, defineCommand, defineModule } from './modules';
 import { config } from '..';
+import { Logger } from '../util/logger';
 
 export const extension: Module = defineModule(
   'extension',
@@ -49,6 +50,7 @@ export const extension: Module = defineModule(
     ),
   ],
   (bot) => {
+    Logger.debug('Extensions', `Loading startup extensions: ${config.extensions.onstartup}`);
     config.extensions.onstartup.forEach((path: string) => {
       Extension.execute(readFileSync(`${config.extensions.root}/${path}`, 'utf8'), bot);
     });

@@ -1,16 +1,16 @@
-import { lastSeenStore } from '..';
+import { LastSeen } from '../bot/services/lastseen';
 import { CommandErrorId, defineCommand, defineModule, Module } from './modules';
 
 export const social: Module = defineModule('social', [
   defineCommand('lastseen', '<nick>', 'Tells you the last time i saw a nick', (cmd) => {
     if (!cmd.args[0]) throw CommandErrorId.NotEnoughArguments;
 
-    const storeval = lastSeenStore.get(cmd.args[0]);
-    if (!storeval) throw CommandErrorId.InternalFailure;
-    const lastts = Number.parseInt(storeval);
-    const date = new Date();
-    date.setTime(lastts);
+    const info = LastSeen.when(cmd.args[0]);
+    if (!info.message) throw "I've never seen them before.";
 
-    cmd.respond(lastts > 0 ? `${date.getUTCDate()}/${date.getUTCMonth()}/${date.getUTCFullYear()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}` : `I have never seen ${cmd.args[0]}`);
+    const date = new Date();
+    date.setUTCMilliseconds(info.time);
+
+    cmd.respond(`${date.getUTCDate()}/${date.getUTCMonth()}/${date.getUTCFullYear()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}, <${cmd.args[0]}>: ${info.message}`);
   }),
 ]);

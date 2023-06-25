@@ -1,16 +1,21 @@
 import { lastSeenStore } from '../..';
-import { Logger } from '../../util/logger';
+
+interface SeenInfo {
+  time: number;
+  message: string;
+}
 
 export class LastSeen {
-  static seen(nick: string) {
-    lastSeenStore.set(nick, Date.now().toString());
-    Logger.debug('Last seen', `saw ${nick}`);
+  static seen(nick: string, message: string) {
+    const info: SeenInfo = {
+      time: Date.now(),
+      message,
+    };
+
+    lastSeenStore.set(nick, JSON.stringify(info));
   }
 
-  static seeall(nicks: string[]) {
-    nicks.forEach((nick) => {
-      lastSeenStore.set(nick, Date.now().toString());
-    });
-    Logger.debug('Last seen', `Saw all of ${nicks.join(' ')}`);
+  static when(nick: string): SeenInfo {
+    return JSON.parse(lastSeenStore.get(nick) || '{"time":0,"message":""}');
   }
 }

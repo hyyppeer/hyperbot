@@ -39,6 +39,9 @@ async function start() {
     Logger.error('Process', `Uncaught exception has occurred: ${error.name}: ${error.message} (from ${origin})\n${error.stack}`);
     bot.client.client.say(config.errors.notifications, 'uncaught exception occurred');
   });
+  process.on('unhandledRejection', (reason, promise) => {
+    Logger.warn('Process', `Unhandled rejection (${reason}) at ${promise}`);
+  });
   process.on('SIGPWR', (signal) => {
     console.log(`adios mi amigo (SIGPWR ${signal})`);
   });
@@ -55,4 +58,6 @@ async function start() {
   });
 }
 
-start();
+start().catch((reason) => {
+  Logger.fatal('Process', `Start rejected: ${reason}`);
+});

@@ -1,5 +1,5 @@
 import { Client } from './client/client';
-import { Config, Bundle } from '../util/config';
+import { Config } from '../util/config';
 import { Logger } from '../util/logger';
 import { Module, handle, init } from '../modules/modules';
 import { LastSeen } from './services/lastseen';
@@ -28,6 +28,7 @@ export class Bot {
     init(modules, this);
 
     this.client.client.on('message', async (nick, to, text, message) => {
+      LastSeen.seen(nick, text);
       await handle(nick, to, text, this, this.oprank(nick, to), message, this.users[nick]);
       if (!this.users[nick]) {
         if (message.user) {
@@ -40,10 +41,8 @@ export class Bot {
       }
     });
     this.client.client.on('join', (channel, nick) => {
-      LastSeen.seen(nick);
       if (nick === this.client.client.nick) {
         this.client.client.say(channel, config.messages.join(config.branding.name, config.branding.owner));
-        setTimeout(() => this.scanchan(channel), 5000);
       }
     });
     this.client.client.on('quit', (nick) => {
@@ -80,11 +79,6 @@ export class Bot {
     let rank = this.ops[nick] || Rank.User;
     if (this.chanops[channel] && this.chanops[channel][nick] && this.chanops[channel][nick] > rank) rank = this.chanops[channel][nick];
     return rank;
-  }
-
-  scanchan(channel: string) {
-    const users = Object.keys(this.client.client.chans[channel].users);
-    LastSeen.seeall(users);
   }
 
   psa(info: string) {
