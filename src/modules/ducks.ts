@@ -1,17 +1,18 @@
 import { config } from '..';
 import { Bot } from '../bot/bot';
+import { Client } from '../bot/client/client';
 import { Module, defineCommand, defineModule } from './modules';
 
 let duck = false;
 let lastDuckBefriended = false;
 
-function addDuck(bot: Bot) {
-  bot.client.client.say(config.ducks.channel, 'QUACK!! (-bef to befriend)');
+function addDuck(bot: Bot, client: Client) {
+  client.client.say(config.ducks.channel, 'QUACK!! (-bef to befriend)');
   duck = true;
   lastDuckBefriended = false;
   setTimeout(() => {
     if (lastDuckBefriended || !duck) return;
-    bot.client.client.say(config.ducks.channel, 'quack :( the duck has left!');
+    client.client.say(config.ducks.channel, 'quack :( the duck has left!');
     duck = false;
     lastDuckBefriended = false;
   }, 5 * 60 * 1000);
@@ -46,6 +47,6 @@ export const ducks: Module = defineModule(
     // ),
   ],
   (bot) => {
-    setInterval(() => addDuck(bot), 15 * 60 * 1000);
+    bot.clients.forEach((client) => setInterval(() => addDuck(bot, client), 15 * 60 * 1000));
   }
 );

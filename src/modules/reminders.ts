@@ -10,7 +10,7 @@ export const reminders: Module = defineModule('reminders', [
     }
 
     const due = Date.now() + duration * 60 * 1000;
-    Reminder.add(cmd.runner, due, cmd.args.slice(1).join(' '), cmd.bot);
+    Reminder.add(cmd.runner, due, cmd.args.slice(1).join(' '), cmd.client);
     cmd.respond('Your reminder has been added!');
   }),
 ]);

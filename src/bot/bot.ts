@@ -11,7 +11,7 @@ export enum Rank {
 }
 
 export class Bot {
-  client: Client;
+  clients: Client[];
   connected: boolean = false;
   users: Record<string, string> = {};
   private ops: {
@@ -23,32 +23,38 @@ export class Bot {
     };
   } = {};
   constructor(config: Config, modules: Module[]) {
-    this.client = new Client(config.conn.server, config.conn.port, config.branding.name, config.conn.secure, config.bot.channels, config.branding.username, config.branding.realname);
+    this.clients = [];
+    config.conn.servers.forEach((server: [string, number, boolean]) => {
+      this.clients.push(new Client(server[0], server[1], config.branding.name, server[2], config.bot.channels, config.branding.username, config.branding.realname));
+    });
+
     init(modules, this);
 
-    this.client.client.on('message', (nick, to, text, message) => {
-      handle(nick, to, text, this, this.oprank(nick, to), message, this.users[nick]);
-      if (!this.users[nick]) {
-        if (message.user) {
-          this.users[nick] = message.user;
-        } else
-          this.client.whois(nick).then((info) => {
-            this.users[nick] = info.user;
-          });
-      }
-    });
-    this.client.client.on('join', (channel, nick) => {
-      if (nick === this.client.client.nick) {
-        this.client.client.say(channel, config.messages.join(config.branding.name, config.branding.owner));
-      }
-    });
-    this.client.client.on('quit', (nick) => {
-      if (this.ops[nick]) delete this.ops[nick];
-      if (this.users[nick]) delete this.users[nick];
-    });
-    this.client.client.on('registered', () => {
-      this.connected = true;
-      Logger.debug('Bot', 'Registered on network');
+    this.clients.forEach((client) => {
+      client.client.on('message', (nick, to, text, message) => {
+        handle(nick, to, text, this, this.oprank(nick, to), message, client, this.users[nick]);
+        if (!this.users[nick]) {
+          if (message.user) {
+            this.users[nick] = message.user;
+          } else
+            client.whois(nick).then((info) => {
+              this.users[nick] = info.user;
+            });
+        }
+      });
+      client.client.on('join', (channel, nick) => {
+        if (nick === client.client.nick) {
+          client.client.say(channel, config.messages.join(config.branding.name, config.branding.owner));
+        }
+      });
+      client.client.on('quit', (nick) => {
+        if (this.ops[nick]) delete this.ops[nick];
+        if (this.users[nick]) delete this.users[nick];
+      });
+      client.client.on('registered', () => {
+        this.connected = true;
+        Logger.debug('Bot', 'Registered on network');
+      });
     });
   }
 
@@ -79,8 +85,10 @@ export class Bot {
   }
 
   psa(info: string) {
-    Object.keys(this.client.client.chans).forEach((channel) => {
-      this.client.client.say(channel, `***PSA***: ${info}`);
+    this.clients.forEach((client) => {
+      const chans = Object.keys(client.client.chans);
+
+      chans.forEach((chan) => client.client.say(chan, `**PSA**: ${info}`));
     });
   }
 }
