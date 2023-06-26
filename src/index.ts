@@ -38,7 +38,7 @@ async function start() {
 
   process.on('uncaughtException', (error, origin) => {
     Logger.error('Process', `Uncaught exception has occurred: ${error.name}: ${error.message} (from ${origin})\n${error.stack}`);
-    bot.client.client.say(config.errors.notifications, 'uncaught exception occurred');
+    // bot.clients.client.say(config.errors.notifications, 'uncaught exception occurred');
   });
   process.on('unhandledRejection', (reason, promise) => {
     Logger.warn('Process', `Unhandled rejection (${reason}) at ${promise}`);
@@ -48,17 +48,18 @@ async function start() {
   });
   process.on('SIGABRT', (signal) => {
     Logger.fatal('SIGNALS', `SIGABRT ${signal}`);
-    bot.client.client.disconnect('SIGABRT on bot process');
+    bot.clients.forEach((client) => client.client.disconnect('SIGABRT on bot process'));
   });
   process.on('SIGIOT', (signal) => {
     Logger.fatal('SIGNALS', `SIGIOT ${signal}`);
   });
   process.on('SIGTERM', (signal) => {
-    bot.client.client.disconnect('the user has requested that the bot disconnect');
+    bot.clients.forEach((client) => client.client.disconnect('the user has requested that the bot disconnect'));
     Logger.fatal('SIGNALS', `SIGTERM ${signal}`);
   });
 }
 
 start().catch((reason) => {
   Logger.fatal('Process', `Start rejected: ${reason}`);
+  process.exit(1);
 });

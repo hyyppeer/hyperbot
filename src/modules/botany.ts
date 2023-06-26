@@ -6,6 +6,6 @@ export const botany: Module = defineModule('botany', [
     const plant = new Botany(cmd.args[0] || (await cmd.identify()));
     await plant.read();
     await plant.water(`${await cmd.identify()}, through hyperbot`);
-    cmd.bot.client.client.action(cmd.channel, `waters ${cmd.args[0] || (await cmd.identify())}'s plant`);
+    cmd.client.client.action(cmd.channel, `waters ${cmd.args[0] || (await cmd.identify())}'s plant`);
   }),
 ]);
