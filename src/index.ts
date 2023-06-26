@@ -17,18 +17,19 @@ import { utility } from './modules/utility';
 import { readConfig } from './util/config';
 import { Store } from './util/db';
 import { Logger, LogLevel } from './util/logger';
+import { load } from './util/userdata';
 
 export const config = readConfig('D:/hyperbot-town-irc/config/bot.conf');
 
 export const noPingStore = new Store('noping');
 export const lastSeenStore = new Store('lastseen');
 export const reminderStore = new Store('reminders');
-export const duckStore = new Store('duck');
 export const hpmStore = new Store('hpm');
 
 async function start() {
   Logger.level = LogLevel.Debug;
 
+  load();
   await Shell.start();
   const bot = new Bot(config, [utility, moderation, fun, social, packages, reminders, repl, help, rust, ducks, botany, extension /*, tips*/]);
   const cli = new Cli(bot);

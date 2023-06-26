@@ -1,7 +1,8 @@
 https://github.com/bitbot-irc/bitbot/tree/master/modules is a great source for ideas
 
+[] user accounts, identify using NickServ(Status NICK), link to integrate with other networks through sending a message
 [] refactor: client array instead of single client
-[] refactor: each user has a data object instead of the current store system
+[X] refactor: each user has a data object instead of the current store system
 [] refactor: depend less on using the raw irc client
 [] refactor: custom client
 [X] option to turn off pinging on response

@@ -4,6 +4,7 @@ import { config, noPingStore } from '../index';
 import { Logger } from '../util/logger';
 import chalk from 'chalk';
 import { Message } from '../bot/client/irc';
+import { getUserData, setUserData } from '../util/userdata';
 
 export enum CommandErrorId {
   RequiresIdentification,
@@ -36,9 +37,11 @@ export interface CmdApi {
   responseLoc: string;
   ask(question: string, timeout?: string | Function): Promise<string>;
   confirm(confirmation?: string): Promise<boolean>;
-  user?: string;
+  user: () => Promise<string>;
   identify(): Promise<string>;
   message: Message;
+  data(): Promise<Record<string, any>>;
+  setData(name: string, value: any): void;
 }
 
 export interface Command {
@@ -174,7 +177,7 @@ async function nickauth(nick: string, bot: Bot, message: Message) {
 
 function createApi(nick: string, to: string, text: string, bot: Bot, op: Rank, message: Message, user?: string): CmdApi {
   let responseLocation = bot.client.client.nick === to ? nick : to;
-  return {
+  const cmd: CmdApi = {
     respond(text, opts) {
       let message = text;
       if (!JSON.parse(noPingStore.get('pings') || '[]').includes(nick) && to !== bot.client.client.nick) if (!opts?.silent) message = `${nick}: ${message}`;
@@ -196,14 +199,20 @@ function createApi(nick: string, to: string, text: string, bot: Bot, op: Rank, m
     async confirm(confirmation?: string) {
       return (await this.ask(confirmation || 'Are you sure?')).toLowerCase().startsWith('y') ? true : false;
     },
-    user,
+    user: async () => user || (await cmd.identify()),
     async identify() {
       return new Promise(async (resolve) => {
         resolve(message.user || bot.users[nick] || (await bot.client.whois(nick)).user);
       });
     },
     message,
+    data: async () => getUserData(await (async () => user || (await cmd.identify()))()),
+    async setData(name, value) {
+      setUserData(await this.user(), name, value);
+    },
   };
+
+  return cmd;
 }
 
 export async function handle(nick: string, to: string, text: string, bot: Bot, op: Rank, message: Message, user?: string) {

@@ -12,7 +12,7 @@ export enum LogLevel {
 export class Logger {
   private static loglvl: LogLevel;
   private static wrap(starter: string, message: string) {
-    const width = process.stdout.columns - starter.length;
+    const width = (process.stdout.columns || 128) - starter.length;
     const regex = new RegExp(`.{0,${width}}`, 'g');
     let lines = message.match(regex);
 
