@@ -5,7 +5,6 @@ import { Logger } from '../util/logger';
 import chalk from 'chalk';
 import { Message } from '../bot/client/irc';
 import { getUserData, setUserData } from '../util/userdata';
-import { Client } from '../bot/client/client';
 
 export enum CommandErrorId {
   RequiresIdentification,
@@ -27,7 +26,6 @@ interface RespondOptions {
 }
 
 export interface CmdApi {
-  client: Client;
   respond(text: string, opts?: RespondOptions): void;
   runner: string;
   args: Array<string>;
@@ -162,14 +160,14 @@ function call(cmd: CmdApi, command: string) {
 
 let ownernick = '';
 
-async function nickauth(nick: string, bot: Bot, message: Message, client: Client) {
+async function nickauth(nick: string, bot: Bot, message: Message) {
   if (nick === config.auth.ownernick && ownernick !== nick) {
     if (message.user === config.auth.ownernick) {
       ownernick = nick;
       Logger.info('Moderation', `Automatically OP'ed ${nick} to owner via message.user (ownernick is ${config.auth.ownernick})`);
       return;
     }
-    const info = await client.whois(nick);
+    const info = await bot.client.whois(nick);
     if (info.user === config.auth.ownernick) {
       ownernick = nick;
       Logger.info('Moderation', `Automatically OP'ed ${nick} to owner (ownernick is ${config.auth.ownernick})`);
@@ -177,18 +175,17 @@ async function nickauth(nick: string, bot: Bot, message: Message, client: Client
   }
 }
 
-function createApi(nick: string, to: string, text: string, bot: Bot, op: Rank, message: Message, client: Client, user?: string): CmdApi {
-  let responseLocation = client.client.nick === to ? nick : to;
+function createApi(nick: string, to: string, text: string, bot: Bot, op: Rank, message: Message, user?: string): CmdApi {
+  let responseLocation = bot.client.client.nick === to ? nick : to;
   const cmd: CmdApi = {
-    client,
     respond(text, opts) {
       let message = text;
-      if (!JSON.parse(noPingStore.get('pings') || '[]').includes(nick) && to !== client.client.nick) if (!opts?.silent) message = `${nick}: ${message}`;
-      client.client.say(opts?.pm || false ? nick : responseLocation, message);
+      if (!JSON.parse(noPingStore.get('pings') || '[]').includes(nick) && to !== bot.client.client.nick) if (!opts?.silent) message = `${nick}: ${message}`;
+      bot.client.client.say(opts?.pm || false ? nick : responseLocation, message);
     },
     runner: nick,
-    args: text.startsWith(config.bot.prefix) ? text.substring(config.bot.prefix.length).split(' ').slice(1) : to === client.client.nick ? text.split(' ').slice(1) : [],
-    arg: text.startsWith(config.bot.prefix) ? text.substring(config.bot.prefix.length).split(' ').slice(1).join(' ') : to === client.client.nick ? text.split(' ').slice(1).join(' ') : '',
+    args: text.startsWith(config.bot.prefix) ? text.substring(config.bot.prefix.length).split(' ').slice(1) : to === bot.client.client.nick ? text.split(' ').slice(1) : [],
+    arg: text.startsWith(config.bot.prefix) ? text.substring(config.bot.prefix.length).split(' ').slice(1).join(' ') : to === bot.client.client.nick ? text.split(' ').slice(1).join(' ') : '',
     todo() {
       this.respond('This command is TODO');
     },
@@ -197,7 +194,7 @@ function createApi(nick: string, to: string, text: string, bot: Bot, op: Rank, m
     channel: to,
     responseLoc: responseLocation,
     async ask(question, timeout) {
-      return client.question(nick, question, timeout || '', responseLocation);
+      return bot.client.question(nick, question, timeout || '', responseLocation);
     },
     async confirm(confirmation?: string) {
       return (await this.ask(confirmation || 'Are you sure?')).toLowerCase().startsWith('y') ? true : false;
@@ -205,7 +202,7 @@ function createApi(nick: string, to: string, text: string, bot: Bot, op: Rank, m
     user: async () => user || (await cmd.identify()),
     async identify() {
       return new Promise(async (resolve) => {
-        resolve(message.user || bot.users[nick] || (await client.whois(nick)).user);
+        resolve(message.user || bot.users[nick] || (await bot.client.whois(nick)).user);
       });
     },
     message,
@@ -218,10 +215,10 @@ function createApi(nick: string, to: string, text: string, bot: Bot, op: Rank, m
   return cmd;
 }
 
-export async function handle(nick: string, to: string, text: string, bot: Bot, op: Rank, message: Message, client: Client, user?: string) {
-  const cmd: CmdApi = createApi(nick, to, text, bot, op, message, client, user);
+export async function handle(nick: string, to: string, text: string, bot: Bot, op: Rank, message: Message, user?: string) {
+  const cmd: CmdApi = createApi(nick, to, text, bot, op, message, user);
 
-  await nickauth(nick, bot, message, client);
+  await nickauth(nick, bot, message);
 
   if (nick === ownernick) {
     cmd.op = Rank.Owner;
@@ -234,7 +231,7 @@ export async function handle(nick: string, to: string, text: string, bot: Bot, o
     return;
   }
 
-  if (text.startsWith(config.bot.prefix) || to === client.client.nick) {
+  if (text.startsWith(config.bot.prefix) || to === bot.client.client.nick) {
     const cmdtext = text.startsWith(config.bot.prefix) ? text.substring(config.bot.prefix.length) : text;
     const split = cmdtext.split(' ');
     call(cmd, split[0]);
