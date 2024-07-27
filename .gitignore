@@ -2,6 +2,7 @@ config/
 dist/
 node_modules/
 tsconfig.tsbuildinfo
-db/*
+db/
 jsonpkg-review/
 extensions/*.js
+logs/

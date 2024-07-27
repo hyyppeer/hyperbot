@@ -1,4 +1,5 @@
 import { Bot } from '../bot';
+import { Logger } from '../../util/logger'
 
 export class Cli {
   prefix: string = '\\';
@@ -12,6 +13,7 @@ export class Cli {
 
   private handle(text: string) {
     if (text.startsWith(this.prefix)) {
+      Logger.debug('Cli', 'Starts with prefix')
       const cmdstr = text.substring(this.prefix.length);
 
       const split = cmdstr.split(' ');

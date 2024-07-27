@@ -1,7 +1,7 @@
 import { Bot } from './bot/bot';
 import { Cli } from './bot/services/cli';
 import { Reminder } from './bot/services/reminders';
-import { Shell } from './bot/services/town/shell';
+//import { Shell } from './bot/services/town/shell';
 import { botany } from './modules/botany';
 import { ducks } from './modules/ducks';
 import { extension } from './modules/extension';
@@ -19,7 +19,25 @@ import { Store } from './util/db';
 import { Logger, LogLevel } from './util/logger';
 import { load } from './util/userdata';
 
-export const config = readConfig('D:/hyperbot-town-irc/config/bot.conf');
+let configPropsAlreadyShown: string[] = []
+let configSubpropsAlreadyShown: string[] = []
+export const config = new Proxy(readConfig('/home/hyper/hyperbot/config/bot.conf'), {
+	get(target, prop, receiver) {
+		let propname = String(prop)
+		if (!configPropsAlreadyShown.includes(propname)) Logger.info('Config', `Read prop: ${propname}`)
+		configPropsAlreadyShown.push(propname)
+		let got = Reflect.get(target, prop, receiver)
+		if (typeof got !== "object") return got
+		return new Proxy(got, {
+			get(target2, prop2, receiver2) {
+				let propname2 = String(prop2)
+				if (!configSubpropsAlreadyShown.includes(`${propname}.${propname2}`)) Logger.info('Config', `Read prop: ${propname}.${propname2}`)
+				configSubpropsAlreadyShown.push(`${propname}.${propname2}`)
+				return Reflect.get(target2, prop2, receiver2)
+			}
+		})
+	}
+});
 
 export const noPingStore = new Store('noping');
 export const lastSeenStore = new Store('lastseen');
@@ -30,7 +48,7 @@ async function start() {
   Logger.level = LogLevel.Debug;
 
   load();
-  await Shell.start();
+  //await Shell.start();
   const bot = new Bot(config, [utility, moderation, fun, social, packages, reminders, repl, help, rust, ducks, botany, extension /*, tips*/]);
   const cli = new Cli(bot);
 
