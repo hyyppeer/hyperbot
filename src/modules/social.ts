@@ -17,6 +17,6 @@ export const social: Module = defineModule(
     }),
   ],
   (bot) => {
-    bot.clients.forEach((client) => client.client.on('message', (nick, to, text) => LastSeen.seen(nick, text)));
+    bot.client.client.on('message', (nick, to, text) => LastSeen.seen(nick, text));
   }
 );

@@ -113,7 +113,7 @@ export class JsonCommands {
                   cmd.respond(parseArgArr(action.args, cmd));
                   break;
                 case 'do':
-                  cmd.client.client.action(cmd.channel === cmd.client.client.nick ? cmd.runner : cmd.channel, parseArgArr(action.args, cmd));
+                  cmd.bot.client.client.action(cmd.channel === cmd.bot.client.client.nick ? cmd.runner : cmd.channel, parseArgArr(action.args, cmd));
                   break;
                 default:
                   break;

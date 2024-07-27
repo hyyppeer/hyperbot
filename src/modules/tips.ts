@@ -12,13 +12,11 @@ function getRandomTip(): string {
 }
 
 export const tips: Module = defineModule('tips', [], (bot) =>
-  bot.clients.forEach((client) => {
-    client.client.on('join', (channel, nick) => {
-      if (nick !== client.client.nick) return;
+  bot.client.client.on('join', (channel, nick) => {
+    if (nick !== bot.client.client.nick) return;
 
-      setInterval(() => {
-        client.client.say(channel, getRandomTip());
-      }, 10 * 60 * 1000);
-    });
+    setInterval(() => {
+      bot.client.client.say(channel, getRandomTip());
+    }, 10 * 60 * 1000);
   })
 );
